@@ -19,14 +19,16 @@ const PORT = 3000;
 app.get('/prueba', async (req, res) => {
     console.log(req);
 
+    console.log("valor de la variable"+ process.env.MQTT_BROKER_URL);
+
     // Responder con un mensaje
     res.json({ mensaje: "mundo" });
 
     // Configuración para la conexión MQTT
-    const mqttBrokerUrl = 'mqtt.akenza.io';
-    const username = '07a4b4f1eb885557';
-    const password = 'pg9m0s2rsojboe12d2v4i1wr27dfb0co';
-    const deviceId = '/up/pg9m0s2rsojboe12d2v4i1wr27dfb0co/id/B62F1FF85B9BD193/light/neopixels/command';
+    const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+    const username = process.env.MQTT_USERNAME;
+    const password = process.env.MQTT_PASSWOR;
+    const deviceId = process.env.MQTT_DEVICE_ID;
     const topic = `${deviceId}`;
 
     var options = {
