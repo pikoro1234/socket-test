@@ -122,7 +122,7 @@ app.post('/audio', async (req, res) => {
 
         const body = {
             "command": command,
-            "file": `${file}`
+            "file": parseInt(file)
         };
 
         console.log(body);
