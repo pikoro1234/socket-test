@@ -98,11 +98,8 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
-console.log("hola");
-
 app.post('/audio', async (req, res) => {
 
-    console.log(req);
     try {
         const { command, file } = req.body;
 
