@@ -29,7 +29,7 @@ app.get('/prueba', async (req, res) => {
     } catch (error) {
         console.log(error);
         // console.error(`Error: ${e.stack}`);
-        res.status(500).json({ error: 'Error al publicar en MQTT' });
+        res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
     }
 });
 
@@ -80,14 +80,14 @@ app.post('/franklin', async (req, res) => {
 
         // Publicar el mensaje en el topic
         await client.publish(topic, JSON.stringify(body));
-        console.log(`Successfully published message to broker ${mqttBrokerUrl} for user ${username}`);
+        console.log(`Successfully published message to broker ${mqttBrokerUrl}`);
 
         // Cerrar la conexión
         await client.end();
 
         // Responder al cliente con éxito
         if (!res.headersSent) {
-            res.json({ message: 'Datos recibidos y publicados en MQTT correctamente' });
+            res.json({ message: 'Datos de los colores publicados en MQTT correctamente' });
         }
 
     } catch (error) {
@@ -98,6 +98,63 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
+app.post('/audio', async (req, res) => {
+    try {
+        const { command, file } = req.body;
+
+        console.log(`commando: ${command}, file: ${file}`);
+
+        // Configuración para la conexión MQTT
+        const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+        const username = process.env.MQTT_USERNAME;
+        const password = process.env.MQTT_PASSWOR;
+        const deviceId = process.env.MQTT_DEVICE_AUDIO;
+        const topic = `${deviceId}`;
+
+        var options = {
+            connectTimeout: 5 * 1000,
+            reconnectPeriod: 0,
+            clientId: "akenza-example",
+            username: username,
+            password: password,
+        };
+
+        const body = {
+            "command": command,
+            "file": `${file}.mp3`
+        };
+
+        // Conectar al broker MQTT y publicar el mensaje
+        const client = await mqtt.connectAsync(
+            `tls://${mqttBrokerUrl}:8883`,
+            options,
+            false
+        );
+
+        // Manejar errores de conexión
+        client.on('error', (err) => {
+            console.log(`Error while sending data to MQTT broker: ${err}`);
+        });
+
+        // Publicar el mensaje en el topic
+        await client.publish(topic, JSON.stringify(body));
+        console.log(`Successfully published message to broker ${mqttBrokerUrl}`);
+
+        // Cerrar la conexión
+        await client.end();
+
+        // Responder al cliente con éxito
+        if (!res.headersSent) {
+            res.json({ message: 'Datos del audio recibidos y publicados en MQTT correctamente' });
+        }
+
+    } catch (error) {
+        console.error(`Error: ${error.stack}`);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Error al procesar la solicitud' });
+        }
+    }
+})
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
