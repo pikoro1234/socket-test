@@ -3,7 +3,7 @@ import express from 'express';
 import mqtt from 'async-mqtt';
 import { config } from 'dotenv';
 import path from 'path';
-import os from 'os'; // Importar el módulo os
+import cors from 'cors';
 
 // Cargar las variables de entorno
 config({
@@ -15,6 +15,9 @@ const app = express();
 
 // Middleware para analizar JSON en el cuerpo de las solicitudes
 app.use(express.json());
+
+// Permitir CORS para todas las rutas
+app.use(cors());
 
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3000;
@@ -50,10 +53,10 @@ app.post('/franklin', async (req, res) => {
 
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
-        console.log("-------------------------------");
-        console.log(req.body);
-        console.log("++++++++++++++++++++++++++++++++");
-        console.log(req);
+        // console.log("-------------------------------");
+        // console.log(req.body);
+        // console.log("++++++++++++++++++++++++++++++++");
+        // console.log(req);
 
         // Configuración para la conexión MQTT
         const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
@@ -101,12 +104,15 @@ app.post('/franklin', async (req, res) => {
         await client.end();
 
         // Responder al cliente con éxito
-        res.json({ message: 'Datos recibidos y publicados en MQTT correctamente' });
-
+        if (!res.headersSent) {
+            res.json({ message: 'Datos recibidos y publicados en MQTT correctamente' });
+        }
 
     } catch (error) {
         console.error(`Error: ${e.stack}`);
-        res.status(500).json({ error: 'Error al procesar la solicitud' });
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Error al procesar la solicitud' });
+        }
     }
 })
 
