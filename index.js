@@ -22,24 +22,10 @@ app.use(cors());
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3000;
 
-// Función para obtener la IP local de la máquina
-// function getLocalIp() {
-//     const interfaces = os.networkInterfaces();
-//     for (const interfaceName in interfaces) {
-//         const addresses = interfaces[ interfaceName ];
-//         for (const addr of addresses) {
-//             if (addr.family === 'IPv4' && !addr.internal) {
-//                 return addr.address; // Retornar la IP de la interfaz activa
-//             }
-//         }
-//     }
-//     return 'localhost'; // Fallback a localhost si no se encuentra otra IP
-// }
-
 // Ruta principal
 app.get('/prueba', async (req, res) => {
     try {
-        res.json({ mensaje: "hola mundo" });
+        res.json({ mensaje: "hola mundo final" });
     } catch (e) {
         console.error(`Error: ${e.stack}`);
         res.status(500).json({ error: 'Error al publicar en MQTT' });
@@ -52,11 +38,6 @@ app.post('/franklin', async (req, res) => {
         const { red, green, blue } = req.body;
 
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
-
-        // console.log("-------------------------------");
-        // console.log(req.body);
-        // console.log("++++++++++++++++++++++++++++++++");
-        // console.log(req);
 
         // Configuración para la conexión MQTT
         const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
@@ -118,7 +99,5 @@ app.post('/franklin', async (req, res) => {
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-    // const host = getLocalIp();
-    // console.log(host);
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
