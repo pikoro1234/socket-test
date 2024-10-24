@@ -98,7 +98,11 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
+console.log("hola");
+
 app.post('/audio', async (req, res) => {
+
+    console.log(req);
     try {
         const { command, file } = req.body;
 
@@ -124,6 +128,7 @@ app.post('/audio', async (req, res) => {
             "file": `${file}.mp3`
         };
 
+        console.log(body);
         // Conectar al broker MQTT y publicar el mensaje
         const client = await mqtt.connectAsync(
             `tls://${mqttBrokerUrl}:8883`,
@@ -145,7 +150,7 @@ app.post('/audio', async (req, res) => {
 
         // Responder al cliente con éxito
         if (!res.headersSent) {
-            res.json({ message: 'Datos del audio recibidos y publicados en MQTT correctamente' });
+            res.json({ message: `Datos del audio recibidos y publicados en MQTT correctamente ${mqttBrokerUrl}` });
         }
 
     } catch (error) {
