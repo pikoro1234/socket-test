@@ -25,9 +25,10 @@ const PORT = process.env.PORT || 3000;
 // Ruta principal
 app.get('/prueba', async (req, res) => {
     try {
-        res.json({ mensaje: "hola mundo final" });
-    } catch (e) {
-        console.error(`Error: ${e.stack}`);
+        res.json({ mensaje: "hola mundo V.0" });
+    } catch (error) {
+        console.log(error);
+        // console.error(`Error: ${e.stack}`);
         res.status(500).json({ error: 'Error al publicar en MQTT' });
     }
 });
@@ -90,7 +91,7 @@ app.post('/franklin', async (req, res) => {
         }
 
     } catch (error) {
-        console.error(`Error: ${e.stack}`);
+        console.error(`Error: ${error.stack}`);
         if (!res.headersSent) {
             res.status(500).json({ error: 'Error al procesar la solicitud' });
         }
