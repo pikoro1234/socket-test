@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 // Ruta principal
 app.get('/prueba', async (req, res) => {
     try {
-        res.json({ mensaje: "hola mundo V.0" });
+        res.json({ mensaje: "hola mundo V.1.1" });
     } catch (error) {
         console.log(error);
         // console.error(`Error: ${e.stack}`);
@@ -33,11 +33,28 @@ app.get('/prueba', async (req, res) => {
     }
 });
 
+app.get('/camera', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Camera Feed</title>
+            <style>
+                body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+            </style>
+        </head>
+        <body>
+            <img src="http://192.168.2.112:5000/video_feed/camera1" alt="Camera Feed" style="width: 100%; height: auto;" />
+        </body>
+        </html>
+    `);
+});
 
 app.post('/franklin', async (req, res) => {
     try {
         const { red, green, blue } = req.body;
-
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
         // Configuración para la conexión MQTT
@@ -100,10 +117,15 @@ app.post('/franklin', async (req, res) => {
 
 app.post('/audio', async (req, res) => {
 
+    console.log("MQTT_BROKER_URL " + process.env.MQTT_BROKER_URL);
+    console.log("MQTT_USERNAME " + process.env.MQTT_USERNAME);
+    console.log("MQTT_PASSWOR " + process.env.MQTT_PASSWOR);
+    console.log("MQTT_DEVICE_ID " + process.env.MQTT_DEVICE_ID);
+    console.log("MQTT_DEVICE_AUDIO " + process.env.MQTT_DEVICE_AUDIO);
+    console.log("PORT " + process.env.PORT);
+
     try {
         const { command, file } = req.body;
-
-        console.log(`commando: ${command}, file: ${file}`);
 
         // Configuración para la conexión MQTT
         const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
