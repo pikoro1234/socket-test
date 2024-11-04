@@ -3,7 +3,9 @@ import express from 'express';
 import mqtt from 'async-mqtt';
 import { config } from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
+import fileUpload from 'express-fileupload';
 
 // Cargar las variables de entorno
 config({
@@ -19,6 +21,12 @@ app.use(express.json());
 // Permitir CORS para todas las rutas
 app.use(cors());
 
+// Midelware para leer ficheros
+app.use(fileUpload());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3000;
 
@@ -33,25 +41,7 @@ app.get('/prueba', async (req, res) => {
     }
 });
 
-app.get('/camera', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Camera Feed</title>
-            <style>
-                body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-            </style>
-        </head>
-        <body>
-            <img src="http://192.168.2.112:5000/video_feed/camera1" alt="Camera Feed" style="width: 100%; height: auto;" />
-        </body>
-        </html>
-    `);
-});
-
+// Ruta para los colores
 app.post('/franklin', async (req, res) => {
     try {
         const { red, green, blue } = req.body;
@@ -115,6 +105,7 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
+// Ruta donde recibimos audios estaticos
 app.post('/audio', async (req, res) => {
 
     console.log("MQTT_BROKER_URL " + process.env.MQTT_BROKER_URL);
@@ -179,7 +170,33 @@ app.post('/audio', async (req, res) => {
         }
     }
 })
+
+// Ruta donde esperamos el fichero
+app.post('/upload', async (req, res) => {
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ error: 'No se subió ningún archivo.' });
+        }
+
+        const uploadedFile = req.files.file;
+        const file = uploadedFile.name.toLocaleLowerCase().replace(" ", "-") + ".mp3"
+        const uploadPath = path.join(__dirname, 'uploads', file);
+        uploadedFile.mv(uploadPath, (err) => {
+            if (err) return res.status(500).send(err);
+            res.json({ message: 'Archivo subido correctamente!' });
+        });
+    } catch (error) {
+        console.error(`Error recived file: ${error.stack}`);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Error al mover el archivo', details: err });
+        }
+    }
+})
+
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
+
+
+// https://urbicomm.io/urbidata/uploads/test-hola.mp3
