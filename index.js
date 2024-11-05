@@ -193,6 +193,13 @@ app.post('/upload', async (req, res) => {
     }
 })
 
+// Ruta donde realizamos la lectura de directorio para obtener los ficheros 
+app.get('/read-uploads', (req, res) => {
+    const uploadsPath = path.join(__dirname, 'uploads');
+    res.send(`este es el directorio ${uploadsPath}`)
+})
+// Ruta donde obtenemos los datos de la Basic
+// app.post('', )
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
