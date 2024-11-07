@@ -1,5 +1,5 @@
 // Importar Express
-import express from 'express';
+import express, { application } from 'express';
 import mqtt from 'async-mqtt';
 import { config } from 'dotenv';
 import path from 'path';
@@ -7,7 +7,9 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import fs from 'fs'
+/********** refactoryn imports *********/
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
+import { verifyTokken } from './services/generateTokken.js';
 
 // Cargar las variables de entorno
 config({
@@ -26,6 +28,9 @@ app.use(cors());
 // Midelware para leer ficheros
 app.use(fileUpload());
 
+// Eliminamos el aviso de que frame utilizamos
+app.disable('x-powered-by');
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -38,7 +43,6 @@ app.get('/', async (req, res) => {
         res.sendFile(path.join(__dirname, 'index.html'));
     } catch (error) {
         console.log(error);
-        // console.error(`Error: ${e.stack}`);
         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
     }
 });
@@ -72,7 +76,7 @@ app.post('/franklin', async (req, res) => {
         // Configuración para la conexión MQTT
         const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
         const username = process.env.MQTT_USERNAME;
-        const password = process.env.MQTT_PASSWOR;
+        const password = process.env.MQTT_PASSWORD;
         const deviceId = process.env.MQTT_DEVICE_ID;
         const topic = `${deviceId}`;
 
@@ -185,7 +189,9 @@ app.get('/read-uploads', (req, res) => {
 /****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
 
 // Ruta donde recibimos audios estaticos
-app.post('/audio', async (req, res) => {
+app.post('/audio', verifyTokken, async (req, res) => {
+
+    console.log(req);
 
     try {
         const { command, file } = req.body;
@@ -194,12 +200,16 @@ app.post('/audio', async (req, res) => {
             // "file": `${file}.mp3`
             "file": "https://urbicomm.io/urbidata/uploads/test-hola.mp3"
         };
-        sendMqttMessage(process.env.MQTT_DEVICE_AUDIO,body);
+        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
+        // res.json({ message: 'Mensaje enviado correctamente' });
+
+        // Responder al cliente una vez que se haya enviado el mensaje
+        res.status(200).json({ message: 'Audio enviado correctamente' });
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
         if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al procesar la solicitud' });
+            res.status(500).json({ message: 'Error al procesar la solicitud' });
         }
     }
 })
