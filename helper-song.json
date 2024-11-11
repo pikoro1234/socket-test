@@ -1,0 +1,32 @@
+[
+  {
+    "id": "23sdf234rsdf",
+    "name": "ficheroUno.mp3",
+    "hora": "20:04",
+    "dias": "LUN,MAR,MIE"
+  },
+  {
+    "id": "03e37fe9a269977f",
+    "name": "dddf.mp3",
+    "hora": "18:01",
+    "dias": "[\"MIE\",\"JUE\",\"VIE\"]"
+  },
+  {
+    "id": "da23b53c4bf3b6c8",
+    "name": "dddf.mp3",
+    "hora": "18:01",
+    "dias": "[\"MIE\",\"JUE\",\"VIE\"]"
+  },
+  {
+    "id": "d025d47a41586545",
+    "name": "dddf.mp3",
+    "hora": "18:01",
+    "dias": "[\"MIE\",\"JUE\",\"VIE\"]"
+  },
+  {
+    "id": "766b7a1392a518ed",
+    "name": "dddf.mp3",
+    "hora": "18:01",
+    "dias": "[\"VIE\"]"
+  }
+]

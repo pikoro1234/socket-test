@@ -10,6 +10,7 @@ import fs from 'fs'
 /********** refactoryn imports *********/
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
+import {appendInFile}from './services/functionsGenerics.js'
 
 // Cargar las variables de entorno
 config({
@@ -131,30 +132,23 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
+
+/****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
+
 // Ruta donde esperamos el fichero
-app.post('/upload', async (req, res) => {
+app.post('/append-upload', verifyTokken, async (req, res) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).json({ error: 'No se subió ningún archivo.' });
         }
-
         const uploadedFile = req.files.file;
         const file = uploadedFile.name.toLocaleLowerCase().replace(" ", "-") + ".mp3"
         const uploadPath = path.join(__dirname, 'uploads', file);
+        const fileSong = path.join(__dirname, 'helper-song.json');
         uploadedFile.mv(uploadPath, async (err) => {
             if (err) return res.status(500).send(err);
-            // await sendMqttMessage("topic","mensaje");
-            // res.json({ message: 'Archivo subido correctamente!' });
-
-            // Llama a la función MQTT después de subir el archivo
-            // const result = await sendMqttMessage('mi/topic', 'Archivo subido: ');
-            // if (result.success) {
-            //     console.log("verda");
-            //     res.json({ message: 'Archivo subido correctamente y mensaje MQTT enviado' });
-            // } else {
-            //     console.log("falso");
-            //     res.status(500).json({ message: 'Archivo subido, pero ocurrió un error al enviar mensaje MQTT', error: result.error });
-            // }
+            res.json({ message: 'Archivo subido correctamente!' });
+            appendInFile(fileSong,file,req.body.horaForm,req.body.diasForm)
         });
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
@@ -163,9 +157,29 @@ app.post('/upload', async (req, res) => {
         }
     }
 })
+// Ruta donde recibimos audios estaticos
+app.post('/audio', verifyTokken, async (req, res) => {
+    try {
+        const { command, file } = req.body;
+        const body = {
+            "command": `${command}`,
+            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file}`
+        };
+        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
+
+        // Responder al cliente una vez que se haya enviado el mensaje
+        res.status(200).json({ message: 'Audio enviado correctamente' });
+
+    } catch (error) {
+        console.error(`Error: ${error.stack}`);
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Error al procesar la solicitud' });
+        }
+    }
+})
 
 // Ruta donde realizamos la lectura de directorio para obtener los ficheros 
-app.get('/read-uploads', (req, res) => {
+app.get('/read-uploads', verifyTokken, (req, res) => {
     const uploadsPath = path.join(__dirname, 'uploads');
     const filesResponse = []
     fs.readdir(uploadsPath, (err, files) => {
@@ -185,34 +199,6 @@ app.get('/read-uploads', (req, res) => {
     })
 })
 
-
-/****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
-
-// Ruta donde recibimos audios estaticos
-app.post('/audio', verifyTokken, async (req, res) => {
-
-    console.log(req);
-
-    try {
-        const { command, file } = req.body;
-        const body = {
-            "command": `${command}`,
-            // "file": `${file}.mp3`
-            "file": "https://urbicomm.io/urbidata/uploads/test-hola.mp3"
-        };
-        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
-        // res.json({ message: 'Mensaje enviado correctamente' });
-
-        // Responder al cliente una vez que se haya enviado el mensaje
-        res.status(200).json({ message: 'Audio enviado correctamente' });
-
-    } catch (error) {
-        console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Error al procesar la solicitud' });
-        }
-    }
-})
 
 
 
