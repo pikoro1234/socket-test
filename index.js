@@ -34,7 +34,7 @@ app.disable('x-powered-by');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const fileSong = path.join(__dirname, 'helper-song.json');
+const fileSong = path.join(__dirname, 'songs-file.json');
 
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3000;
@@ -69,10 +69,123 @@ app.get('/prueba', async (req, res) => {
     }
 });
 
-// Ruta para los colores
-app.post('/franklin', async (req, res) => {
+
+/****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
+
+// Ruta donde esperamos el fichero
+app.post('/append-upload', verifyTokken, async (req, res) => {
     try {
-        const { red, green, blue } = req.body;
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ error: 'No se subió ningún archivo.' });
+        }
+        const uploadedFile = req.files.file;
+        const file = uploadedFile.name.toLocaleLowerCase().replace(" ", "-") + ".mp3"
+        const uploadPath = path.join(__dirname, 'uploads', file);
+        uploadedFile.mv(uploadPath, async (err) => {
+            if (err) return res.status(500).send(err);
+            res.json({ message: 'Archivo subido correctamente!' });
+            appendInFile(fileSong, file, req.body.horaForm, req.body.diasForm)
+        });
+    } catch (error) {
+        console.error(`Error recived file: ${error.stack}`);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Error al mover el archivo', details: err });
+        }
+    }
+})
+
+app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
+    try {
+        let response = {}
+        fs.readFile(fileSong, 'utf-8', (err, data) => {
+            if (err) {
+                console.log("error al leer el fichero", err);
+                return;
+            }
+
+            JSON.parse(data).forEach((element) => {
+                if (element.id === req.params.id) {
+                    response = {
+                        "id": element.id,
+                        "name": element.name,
+                        "hora": element.hora,
+                        "dias": element.dias
+                    };
+                }
+            });
+
+            if (response !== undefined) {
+                res.json(response);
+            } else {
+                res.json(response);
+            }
+        })
+    } catch (error) {
+        console.error(`Error recived file: ${error.stack}`);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
+        }
+    }
+})
+
+// Ruta donde realizamos la lectura de directorio para obtener los ficheros 
+app.get('/read-uploads', verifyTokken, (req, res) => {
+    const uploadsPath = path.join(__dirname, 'uploads');
+    const filesResponse = []
+    fs.readdir(uploadsPath, (err, files) => {
+        if (err) {
+            return res.status(400).json({ mensaje: "error al leer el directorio", content: filesResponse })
+        } else {
+            try {
+                files.map(file => {
+                    filesResponse.push(file)
+                    console.log(file);
+                })
+                return res.status(200).json({ mensaje: "ficheros enviados", content: filesResponse })
+            } catch (error) {
+                return res.status(404).json({ mensaje: "error al leer los ficheros", content: filesResponse })
+            }
+        }
+    })
+})
+
+// Ruta donde recibimos audios
+app.post('/audio', verifyTokken, async (req, res) => {
+    try {
+        const { command, file } = req.body;
+        const body = {
+            "command": `${command}`,
+            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file}`
+        };
+        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
+
+        // Responder al cliente una vez que se haya enviado el mensaje
+        res.status(200).json({ message: 'Audio enviado correctamente' });
+
+    } catch (error) {
+        console.error(`Error: ${error.stack}`);
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Error al procesar la solicitud' });
+        }
+    }
+})
+
+// Ruta trigger sons de farolas
+app.get('/time-song-trigger', verifyTokken, (req, res) => {
+    fs.readFile(fileSong, 'utf-8', (err, data) => {
+        if (err) {
+            console.log("Error al leer el fichero", err);
+            return;
+        }
+        const songFile = JSON.parse(data);
+        res.json(songFile);
+    })
+})
+
+// Ruta para los colores
+app.post('/lights', verifyTokken, async (req, res) => {
+    try {
+        const { red, green, blue, command } = req.body;
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
         // Configuración para la conexión MQTT
@@ -91,7 +204,7 @@ app.post('/franklin', async (req, res) => {
         };
 
         const body = {
-            "state": "ON",
+            "state": command,
             "color": {
                 "r": red,
                 "g": green,
@@ -133,112 +246,7 @@ app.post('/franklin', async (req, res) => {
     }
 })
 
-
-/****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
-
-// Ruta donde esperamos el fichero
-app.post('/append-upload', verifyTokken, async (req, res) => {
-    try {
-        if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).json({ error: 'No se subió ningún archivo.' });
-        }
-        const uploadedFile = req.files.file;
-        const file = uploadedFile.name.toLocaleLowerCase().replace(" ", "-") + ".mp3"
-        const uploadPath = path.join(__dirname, 'uploads', file);
-        uploadedFile.mv(uploadPath, async (err) => {
-            if (err) return res.status(500).send(err);
-            res.json({ message: 'Archivo subido correctamente!' });
-            appendInFile(fileSong, file, req.body.horaForm, req.body.diasForm)
-        });
-    } catch (error) {
-        console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error al mover el archivo', details: err });
-        }
-    }
-})
-// Ruta donde recibimos audios
-app.post('/audio', verifyTokken, async (req, res) => {
-    try {
-        const { command, file } = req.body;
-        const body = {
-            "command": `${command}`,
-            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file}`
-        };
-        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
-
-        // Responder al cliente una vez que se haya enviado el mensaje
-        res.status(200).json({ message: 'Audio enviado correctamente' });
-
-    } catch (error) {
-        console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Error al procesar la solicitud' });
-        }
-    }
-})
-
-// Ruta donde realizamos la lectura de directorio para obtener los ficheros 
-app.get('/read-uploads', verifyTokken, (req, res) => {
-    const uploadsPath = path.join(__dirname, 'uploads');
-    const filesResponse = []
-    fs.readdir(uploadsPath, (err, files) => {
-        if (err) {
-            return res.status(400).json({ mensaje: "error al leer el directorio", content: filesResponse })
-        } else {
-            try {
-                files.map(file => {
-                    filesResponse.push(file)
-                    console.log(file);
-                })
-                return res.status(200).json({ mensaje: "ficheros enviados", content: filesResponse })
-            } catch (error) {
-                return res.status(404).json({ mensaje: "error al leer los ficheros", content: filesResponse })
-            }
-        }
-    })
-})
-
-// Ruta trigger sons de farolas
-app.get('/time-song-trigger', verifyTokken, (req, res) => {
-    fs.readFile(fileSong, 'utf-8', (err, data) => {
-        if (err) {
-            console.log("Error al leer el fichero", err);
-            return;
-        }
-        const songFile = JSON.parse(data);
-        res.json(songFile);
-    })
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
-
-
-// https://urbicomm.io/urbidata/uploads/test-hola.mp3

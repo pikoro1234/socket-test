@@ -4,3 +4,4 @@ env
 .env-example
 env-example
 /uploads
+songs-file.json

@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs, { fdatasyncSync } from 'fs'
 import { uid } from 'uid';
 export function appendInFile(fichero, name, hora, dias) {
     fs.readFile(fichero, 'utf-8', (err, data) => {
@@ -26,3 +26,24 @@ export function appendInFile(fichero, name, hora, dias) {
 
     })
 }
+
+// export function editInFile(fichero, idParams) {
+//     // let response = {}
+//     fs.readFile(fichero, 'utf-8', (err, data) => {
+//         if (err) {
+//             console.log("error al leer el fichero", err);
+//             return;
+//         }
+//         JSON.parse(data).map((element, index) => {
+//             if (element.id === idParams) {
+//                 return {
+//                     "id": element.id,
+//                     "name": element.name,
+//                     "hora": element.hora,
+//                     "dias": element.dias
+//                 }
+//             }
+//         })
+//     })
+//     // console.log(response);
+// }
