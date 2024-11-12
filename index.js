@@ -10,7 +10,7 @@ import fs from 'fs'
 /********** refactoryn imports *********/
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
-import {appendInFile}from './services/functionsGenerics.js'
+import { appendInFile } from './services/functionsGenerics.js'
 
 // Cargar las variables de entorno
 config({
@@ -34,6 +34,7 @@ app.disable('x-powered-by');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const fileSong = path.join(__dirname, 'helper-song.json');
 
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3000;
@@ -144,11 +145,10 @@ app.post('/append-upload', verifyTokken, async (req, res) => {
         const uploadedFile = req.files.file;
         const file = uploadedFile.name.toLocaleLowerCase().replace(" ", "-") + ".mp3"
         const uploadPath = path.join(__dirname, 'uploads', file);
-        const fileSong = path.join(__dirname, 'helper-song.json');
         uploadedFile.mv(uploadPath, async (err) => {
             if (err) return res.status(500).send(err);
             res.json({ message: 'Archivo subido correctamente!' });
-            appendInFile(fileSong,file,req.body.horaForm,req.body.diasForm)
+            appendInFile(fileSong, file, req.body.horaForm, req.body.diasForm)
         });
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
@@ -157,7 +157,7 @@ app.post('/append-upload', verifyTokken, async (req, res) => {
         }
     }
 })
-// Ruta donde recibimos audios estaticos
+// Ruta donde recibimos audios
 app.post('/audio', verifyTokken, async (req, res) => {
     try {
         const { command, file } = req.body;
@@ -196,6 +196,18 @@ app.get('/read-uploads', verifyTokken, (req, res) => {
                 return res.status(404).json({ mensaje: "error al leer los ficheros", content: filesResponse })
             }
         }
+    })
+})
+
+// Ruta trigger sons de farolas
+app.get('/time-song-trigger', verifyTokken, (req, res) => {
+    fs.readFile(fileSong, 'utf-8', (err, data) => {
+        if (err) {
+            console.log("Error al leer el fichero", err);
+            return;
+        }
+        const songFile = JSON.parse(data);
+        res.json(songFile);
     })
 })
 
