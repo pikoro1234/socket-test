@@ -94,6 +94,7 @@ app.post('/append-upload', verifyTokken, async (req, res) => {
     }
 })
 
+// Ruta donde editamos una sola musica
 app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
     try {
         let response = {}
@@ -116,8 +117,6 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
 
             if (response !== undefined) {
                 res.json(response);
-            } else {
-                res.json(response);
             }
         })
     } catch (error) {
@@ -128,34 +127,48 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
     }
 })
 
-// Ruta donde realizamos la lectura de directorio para obtener los ficheros 
-app.get('/read-uploads', verifyTokken, (req, res) => {
-    const uploadsPath = path.join(__dirname, 'uploads');
+// Ruta para eliminar musica en especifico
+app.delete('/delete-upload/:id', verifyTokken, async(req,res)=> {
+    console.log("CON EL METODO DELETE");
+    console.log(path.join(__dirname, 'uploads',req.body.name));
+    console.log(req.params.id);
+    res.json("id desde el backend: "+req.params.id+" el nombre es: "+req.body.name)
+})
+
+// Ruta donde realizamos la lectura de fichero musicas.json para obtener todas las canciones
+app.get('/read-upload-music', verifyTokken, (req, res) => {
     const filesResponse = []
-    fs.readdir(uploadsPath, (err, files) => {
-        if (err) {
-            return res.status(400).json({ mensaje: "error al leer el directorio", content: filesResponse })
-        } else {
-            try {
-                files.map(file => {
-                    filesResponse.push(file)
-                    console.log(file);
-                })
-                return res.status(200).json({ mensaje: "ficheros enviados", content: filesResponse })
-            } catch (error) {
-                return res.status(404).json({ mensaje: "error al leer los ficheros", content: filesResponse })
+    try {
+        fs.readFile(fileSong, 'utf-8', (err, data) => {
+            if (err) {
+                return res.status(400).json({ mensaje: "error al obtener datos del fichero" })
             }
+            const response = JSON.parse(data)
+            response.map((element, index) => {
+                filesResponse.push(element)
+                console.log(element);
+            })
+
+            if (filesResponse.length != 0) {
+                res.json(filesResponse);
+            }
+        })
+    } catch (error) {
+        console.error(`Error recived file: ${error.stack}`);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
         }
-    })
+    }
 })
 
 // Ruta donde recibimos audios
 app.post('/audio', verifyTokken, async (req, res) => {
+    console.log(req.body);
     try {
         const { command, file } = req.body;
         const body = {
             "command": `${command}`,
-            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file}`
+            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file.name}`
         };
         await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
 
@@ -172,14 +185,21 @@ app.post('/audio', verifyTokken, async (req, res) => {
 
 // Ruta trigger sons de farolas
 app.get('/time-song-trigger', verifyTokken, (req, res) => {
-    fs.readFile(fileSong, 'utf-8', (err, data) => {
-        if (err) {
-            console.log("Error al leer el fichero", err);
-            return;
+    try {
+        fs.readFile(fileSong, 'utf-8', (err, data) => {
+            if (err) {
+                console.log("Error al leer el fichero", err);
+                return;
+            }
+            const songFile = JSON.parse(data);
+            res.json(songFile);
+        })
+    } catch (error) {
+        console.error(`Error: ${error.stack}`);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Error al procesar la solicitud' });
         }
-        const songFile = JSON.parse(data);
-        res.json(songFile);
-    })
+    }
 })
 
 // Ruta para los colores
