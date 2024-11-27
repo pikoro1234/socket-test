@@ -11,7 +11,7 @@ import cors from 'cors';
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
 import { appendInFile } from './services/functionsGenerics.js'
-import { getAllDevices } from './controllers/DevicesController.js';
+import deviceRoutes from './routes/deviceRoute.js'
 
 // Cargar las variables de entorno
 config({
@@ -38,7 +38,7 @@ const __dirname = path.dirname(__filename);
 const fileSong = path.join(__dirname, 'songs-file.json');
 
 // Definir el puerto para el servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Ruta principal
 app.get('/', async (req, res) => {
@@ -269,7 +269,7 @@ app.post('/lights', verifyTokken, async (req, res) => {
 
 
 // Desplegamos nueva logica con separacion de funciones
-app.use('/devices', getAllDevices)
+app.use('/devices', deviceRoutes)
 
 // Iniciar el servidor
 app.listen(PORT, () => {
