@@ -38,7 +38,7 @@ const __dirname = path.dirname(__filename);
 const fileSong = path.join(__dirname, 'songs-file.json');
 
 // Definir el puerto para el servidor
-const PORT = process.env.PORT || 3000;ç
+const PORT = process.env.PORT || 3000;
 
 // Ruta principal
 app.get('/', async (req, res) => {
