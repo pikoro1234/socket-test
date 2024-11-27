@@ -1,16 +1,17 @@
 // Importar Express
-import express, { application } from 'express';
 import mqtt from 'async-mqtt';
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import fs from 'fs'
 /********** refactoryn imports *********/
+import express from 'express';
+import cors from 'cors';
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
 import { appendInFile } from './services/functionsGenerics.js'
+import { getAllDevices } from './controllers/DevicesController.js';
 
 // Cargar las variables de entorno
 config({
@@ -37,7 +38,7 @@ const __dirname = path.dirname(__filename);
 const fileSong = path.join(__dirname, 'songs-file.json');
 
 // Definir el puerto para el servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;ç
 
 // Ruta principal
 app.get('/', async (req, res) => {
@@ -68,7 +69,6 @@ app.get('/prueba', async (req, res) => {
         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
     }
 });
-
 
 /****************************** NUEVAS RUTAS DEFINITIVAS ******************************/
 
@@ -128,11 +128,11 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
 })
 
 // Ruta para eliminar musica en especifico
-app.delete('/delete-upload/:id', verifyTokken, async(req,res)=> {
+app.delete('/delete-upload/:id', verifyTokken, async (req, res) => {
     console.log("CON EL METODO DELETE");
-    console.log(path.join(__dirname, 'uploads',req.body.name));
+    console.log(path.join(__dirname, 'uploads', req.body.name));
     console.log(req.params.id);
-    res.json("id desde el backend: "+req.params.id+" el nombre es: "+req.body.name)
+    res.json("id desde el backend: " + req.params.id + " el nombre es: " + req.body.name)
 })
 
 // Ruta donde realizamos la lectura de fichero musicas.json para obtener todas las canciones
@@ -168,8 +168,9 @@ app.post('/audio', verifyTokken, async (req, res) => {
         const { command, file } = req.body;
         const body = {
             "command": `${command}`,
-            "file": `${process.env.URL_SERVER}/urbidata/uploads/${file.name}`
+            "file": `${process.env.URL_SERVER}/uploads/${file.name}`
         };
+
         await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
 
         // Responder al cliente una vez que se haya enviado el mensaje
@@ -265,6 +266,10 @@ app.post('/lights', verifyTokken, async (req, res) => {
         }
     }
 })
+
+
+// Desplegamos nueva logica con separacion de funciones
+app.use('/devices', getAllDevices)
 
 // Iniciar el servidor
 app.listen(PORT, () => {
