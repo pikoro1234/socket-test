@@ -12,16 +12,16 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "async-mqtt": "^2.6.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "express-fileupload": "^1.5.1",
-    "http-proxy-middleware": "^3.0.3",
-    "jsdoc": "^4.0.4",
-    "jsonwebtoken": "^9.0.2",
-    "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.7",
-    "uid": "^2.0.2"
+    "async-mqtt": "2.6.3",
+    "cors": "2.8.5",
+    "dotenv": "16.4.5",
+    "express": "4.21.1",
+    "express-fileupload": "1.5.1",
+    "http-proxy-middleware": "3.0.3",
+    "jsdoc": "4.0.4",
+    "jsonwebtoken": "9.0.2",
+    "node-fetch": "3.3.2",
+    "nodemon": "3.1.7",
+    "uid": "2.0.2"
   }
 }
