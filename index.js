@@ -267,7 +267,7 @@ app.post('/lights', verifyTokken, async (req, res) => {
     }
 })
 
-
+/******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
 app.use('/devices', deviceRoutes)
 
