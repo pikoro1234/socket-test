@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 export function generateTokkenApi() {
     const token = jwt.sign({ role: "usuario" }, process.env.SECRET_TOKKEN, { algorithm: 'HS256' })

@@ -274,7 +274,7 @@ app.post('/lights', verifyTokken, async (req, res) => {
 
 /******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
-app.use('/devices', deviceRoutes)
+app.use('/devices', verifyTokken, deviceRoutes)
 
 app.post('/data-device', async (req, res) => {
     let query_string = '';
@@ -294,10 +294,10 @@ app.post('/data-device', async (req, res) => {
     const queryApi = influxDB.getQueryApi(org);
     if (req.body.queryType === 'franklin') {
         query_string = '|> filter(fn: (r) => r._field == "temperatura" or r._field == "humedad" or r._field == "co2" or r._field == "pm1")';
-    }else if(req.body.queryType === 'solana'){
+    } else if (req.body.queryType === 'solana') {
         query_range = '|> range(start: -30d)'
         query_string = '|> filter(fn: (r) => r._measurement == "Solana PRO")|> filter(fn: (r) => r._field == "humedad" or r._field == "temperatura")'
-    }else if(req.body.queryType === 'basic'){
+    } else if (req.body.queryType === 'basic') {
         query_range = '|> range(start: -1d)'
         query_string = '|> filter(fn: (r) => r._measurement == "Basic")|> filter(fn: (r) => r._field == "magnitude" or r._field == "temperatura")'
     }
@@ -310,7 +310,7 @@ app.post('/data-device', async (req, res) => {
         |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
         |> last()`;
 
-        console.log(fluxQuery);
+    console.log(fluxQuery);
     queryApi.queryRows(fluxQuery, {
         next(row, tableMeta) {
             const data = tableMeta.toObject(row);

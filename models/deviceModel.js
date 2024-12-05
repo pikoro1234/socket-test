@@ -50,7 +50,6 @@ export const fetchDevices = async (workspaceIds) => {
 
         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
 
-        // console.log(await response.json());
         return await response.json();
 
     } catch (error) {

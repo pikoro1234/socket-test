@@ -1,4 +1,5 @@
 import mqtt from 'async-mqtt';
+
 export async function sendMqttMessage(topic, msg) {
     try {
         // Opciones para la conexion
