@@ -8,7 +8,6 @@ import fs from 'fs'
 /********** refactoryn imports *********/
 import express from 'express';
 import cors from 'cors';
-import { InfluxDB } from '@influxdata/influxdb-client';
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
 import { appendInFile } from './services/functionsGenerics.js'
@@ -135,7 +134,6 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
 
 // Ruta para eliminar musica en especifico
 app.delete('/delete-upload/:id', verifyTokken, async (req, res) => {
-    console.log("CON EL METODO DELETE");
     console.log(path.join(__dirname, 'uploads', req.body.name));
     console.log(req.params.id);
     res.json("id desde el backend: " + req.params.id + " el nombre es: " + req.body.name)
@@ -211,7 +209,6 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
 
 // Ruta para los colores
 app.post('/lights', verifyTokken, async (req, res) => {
-    console.log(req);
     try {
         const { red, green, blue, command } = req.body;
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
@@ -276,211 +273,12 @@ app.post('/lights', verifyTokken, async (req, res) => {
 
 /******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
+
+// obtenemos workspace/devices-for-workspace/config-params-device
 app.use('/devices', verifyTokken, deviceRoutes);
 
-// app.use('/data-device', deviceDataRoutes);
-app.post('/data-device', async (req, res) => {
-    let query_string = '';
-    let query_range = '|> range(start: -1h)';
-    const response = [];
-    const token = process.env.TOKKEN_INFLUX_DB;
-    const org = process.env.ORGANIZACION_INFLUX_DB;
-    const bucket = req.body.bucketType;
-    const device_uid = req.body.deviceId;
-    const url = `${process.env.URL_DOMAIN_INDEX_INFLUX_QUERY}?bucket=${bucket}&org=${org}`;
-
-    console.log(bucket);
-    console.log(req.body.queryType);
-    console.log(req.body.deviceId);
-
-    const influxDB = new InfluxDB({ url, token }); // creamos conexion con influxDB
-    const queryApi = influxDB.getQueryApi(org);
-    if (req.body.queryType === 'franklin') {
-        query_string = '|> filter(fn: (r) => r._field == "temperatura" or r._field == "humedad" or r._field == "co2" or r._field == "pm1")';
-    } else if (req.body.queryType === 'solana') {
-        query_range = '|> range(start: -30d)'
-        query_string = '|> filter(fn: (r) => r._measurement == "Solana PRO")|> filter(fn: (r) => r._field == "humedad" or r._field == "temperatura")'
-    } else if (req.body.queryType === 'basic') {
-        query_range = '|> range(start: -1d)'
-        query_string = '|> filter(fn: (r) => r._measurement == "Basic")|> filter(fn: (r) => r._field == "magnitude" or r._field == "temperatura")'
-    }
-
-    // consulta a influxDB por medio de params dinamicos
-    const fluxQuery = `
-        from(bucket: "${bucket}")
-        ${query_range}
-        ${query_string}
-        |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
-        |> last()`;
-
-    console.log(fluxQuery);
-    queryApi.queryRows(fluxQuery, {
-        next(row, tableMeta) {
-            const data = tableMeta.toObject(row);
-            console.log(data);
-            response.push(data)
-        },
-        error(error) {
-            res.json({ error: "error en obtener datos de influx" });
-            console.error('Error al leer los datos:', error);
-        },
-        complete() {
-            res.json({ mensaje: response });
-            console.log('Consulta completada.');
-        },
-    });
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//creamos el servidor websocket 
-// const wss = new WebSocketServer({ port: process.env.PORT_SOCKET });
-
-// console.log(wss);
-// const connectToWebSocketWithApiKey = async () => {
-//     const apiKey = "3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270"; // Reemplaza con tu xApiKey
-//     const wsUrl = "wss://api.akenza.io/v3/data-streams";
-
-//     const ws = new WebSocket(wsUrl, {
-//         headers: {
-//             "x-api-key": apiKey, // Incluye la xApiKey en los encabezados
-//         },
-//     });
-
-//     ws.on("open", () => {
-//         console.log("Conexión exitosa al WebSocket de Akenza con xApiKey");
-
-//         // Mensaje de suscripción (si es necesario)
-//         const subscriptionMessage = {
-//             type: "subscribe",
-//             // id: "uniqueMessageId123", // Opcional, pero recomendado
-//             subscriptions: [
-//                 {
-//                     assetId: "02557d0aad3a373e", // Reemplaza con el ID del dispositivo en Akenza
-//                     // tagId: "tagId", // Opcional, si no hay assetId
-//                     topic: "*", // Suscribirse a todos los temas
-//                 },
-//             ],
-//         };
-
-//         ws.send(JSON.stringify(subscriptionMessage));
-//         console.log("Mensaje de suscripción enviado:", subscriptionMessage);
-//     });
-
-//     ws.on("message", (data) => {
-//         console.log(data);
-//         console.log("Mensaje recibido del WebSocket:", JSON.parse(data));
-//         wss.clients.forEach((client) => {
-//             if (client.readyState === WebSocket.OPEN) {
-//                 client.send(data); // Enviar el mensaje a los clientes conectados
-//             }
-//         });
-//     });
-
-//     ws.on("error", (error) => {
-//         console.error("Error en la conexión WebSocket:", error);
-//     });
-
-//     ws.on("close", (code, reason) => {
-//         console.log(`Conexión cerrada. Código: ${code}, Razón: ${reason}`);
-//     });
-// };
-
-// // Llama la función para conectarte al WebSocket
-// connectToWebSocketWithApiKey();
-
-
-// app.get("/real-time-data", (req, res) => {
-//     res.setHeader("Content-Type", "text/event-stream");
-//     res.setHeader("Cache-Control", "no-cache");
-//     res.setHeader("Connection", "keep-alive");
-
-//     // Enviar un mensaje al cliente cada vez que llegue un nuevo dato desde el WebSocket
-//     const sendDataToClient = (data) => {
-//         res.write(`data: ${JSON.stringify(data)}\n\n`);
-//     };
-
-//     // Escuchar eventos del WebSocket interno
-//     wss.on("connection", (client) => {
-//         console.log(client);
-//         client.on("message", (message) => {
-//             sendDataToClient(JSON.parse(message));
-//         });
-//     });
-
-//     req.on("close", () => {
-//         console.log("Conexión cerrada por el cliente.");
-//     });
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// obtenemos los datos de influxDB data-device
+app.use('/data-device', deviceDataRoutes);
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {

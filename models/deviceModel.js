@@ -9,14 +9,12 @@ config({
 
 // mostrar todos los workspaces --> Desde la API de akenza
 export const fetchWorkspaces = async () => {
-
-    console.log(process.env.ID_ORGANIZACION);
     try {
-        const response = await fetch(`https://api.akenza.io/v3/workspaces?organizationId=2814c3d718dd1526`,{
-            method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json',
-                'x-api-key' : process.env.X_API_KEY
+        const response = await fetch(`https://api.akenza.io/v3/workspaces?organizationId=2814c3d718dd1526`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
             }
         })
 
@@ -32,19 +30,16 @@ export const fetchWorkspaces = async () => {
 
 // mostrar todos los dispositivos --> Desde la API de akenza
 export const fetchDevices = async (workspaceIds) => {
-
-    console.log("en el fetch modifi");
-    console.log(workspaceIds);
     try {
         const response = await fetch('https://api.akenza.io/v3/assets/list', {
-            method : 'POST',
-            headers : {
-                'Content-Type' : 'application/json',
-                'x-api-key' : process.env.X_API_KEY
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
             },
-            body : JSON.stringify({
-                organizationId : process.env.ID_ORGANIZACION,
-                workspaceIds : workspaceIds
+            body: JSON.stringify({
+                organizationId: process.env.ID_ORGANIZACION,
+                workspaceIds: workspaceIds
             }),
         })
 
@@ -61,11 +56,11 @@ export const fetchDevices = async (workspaceIds) => {
 // mostrar datos de un solo dispositivo --> Desde la API de akenza
 export const fetchDataDevice = async (deviceId) => {
     try {
-        const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`,{
-            method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json',
-                'x-api-key' : process.env.X_API_KEY
+        const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
             }
         })
 

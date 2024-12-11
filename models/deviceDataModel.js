@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { InfluxDB } from '@influxdata/influxdb-client';
 import { config } from 'dotenv';
 import path from 'path';
 
@@ -8,74 +8,58 @@ config({
 });
 
 // mostrar todos los datos --> Desde API/influx
-export const getAllDataInflux = async () => {
+export const fetchDataInflux = async (objRequest) => {
+    return new Promise((resolve, reject) => {
+        let query_string = '';
+        let query_range = '|> range(start: -1h)';
+        let query_last = '|> last()';
+        const response = [];
+        const token = process.env.TOKKEN_INFLUX_DB;
+        const org = process.env.ORGANIZACION_INFLUX_DB;
+        const bucket = objRequest.bucketType;
+        const device_uid = objRequest.deviceId;
+        const queryType = objRequest.queryType;
+        const url = `${process.env.URL_DOMAIN_INDEX_INFLUX_QUERY}?bucket=${bucket}&org=${org}`;
+        const influxDB = new InfluxDB({ url, token });
+        const queryApi = influxDB.getQueryApi(org);
 
-//     console.log(process.env.ID_ORGANIZACION);
-//     try {
-//         const response = await fetch(`https://api.akenza.io/v3/workspaces?organizationId=2814c3d718dd1526`,{
-//             method : 'GET',
-//             headers : {
-//                 'Content-Type' : 'application/json',
-//                 'x-api-key' : process.env.X_API_KEY
-//             }
-//         })
+        if (queryType === 'franklin') {
+            query_string = '|> filter(fn: (r) => r._field == "temperatura" or r._field == "humedad" or r._field == "co2" or r._field == "pm1")';
+        } else if (queryType === 'solana') {
+            query_range = '|> range(start: -30d)';
+            query_string = '|> filter(fn: (r) => r._measurement == "Solana PRO") |> filter(fn: (r) => r._field == "humedad" or r._field == "temperatura")';
+        } else if (queryType === 'basic') {
+            query_range = '|> range(start: -1d)';
+            query_string = '|> filter(fn: (r) => r._measurement == "Basic") |> filter(fn: (r) => r._field == "magnitude" or r._field == "temperatura")';
+        }
 
-//         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
+        if (objRequest.dateStart !== '' && objRequest.dateEnd !== '') {
+            query_range = `|> range(start: ${(Math.floor(new Date(objRequest.dateStart).getTime() / 1000))}, stop: ${(Math.floor(new Date(objRequest.dateEnd).getTime() / 1000))})`;
+            query_last = '';
+        }
 
-//         return await response.json();
+        const fluxQuery = `
+            from(bucket: "${bucket}")
+            ${query_range}
+            ${query_string}
+            |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
+            ${query_last}`;
 
-//     } catch (error) {
-//         console.error('Error en obtener datos de los workspace:', error.message);
-//         throw error;
-//     }
-}
+        // console.log(fluxQuery);
 
-// mostrar todos los dispositivos --> Desde la API de akenza
-// export const fetchDevices = async (workspaceIds) => {
-
-//     console.log("en el fetch modifi");
-//     console.log(workspaceIds);
-//     try {
-//         const response = await fetch('https://api.akenza.io/v3/assets/list', {
-//             method : 'POST',
-//             headers : {
-//                 'Content-Type' : 'application/json',
-//                 'x-api-key' : process.env.X_API_KEY
-//             },
-//             body : JSON.stringify({
-//                 organizationId : process.env.ID_ORGANIZACION,
-//                 workspaceIds : workspaceIds
-//             }),
-//         })
-
-//         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
-
-//         // console.log(await response.json());
-//         return await response.json();
-
-//     } catch (error) {
-//         console.error('Error en fetchDevices:', error.message);
-//         throw error;
-//     }
-// }
-
-// mostrar datos de un solo dispositivo --> Desde la API de akenza
-// export const fetchDataDevice = async (deviceId) => {
-//     try {
-//         const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`,{
-//             method : 'GET',
-//             headers : {
-//                 'Content-Type' : 'application/json',
-//                 'x-api-key' : process.env.X_API_KEY
-//             }
-//         })
-
-//         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
-
-//         return await response.json();
-
-//     } catch (error) {
-//         console.error('Error en obtener datos del dispositivo:', error.message);
-//         throw error;
-//     }
-// }
+        queryApi.queryRows(fluxQuery, {
+            next(row, tableMeta) {
+                const data = tableMeta.toObject(row);
+                response.push(data);
+            },
+            error(error) {
+                console.error('Error al leer los datos:', error);
+                reject({ error: "Error al obtener datos de InfluxDB", details: error });
+            },
+            complete() {
+                console.log('Consulta completada.');
+                resolve(response);
+            },
+        });
+    });
+};

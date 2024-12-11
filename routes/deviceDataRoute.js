@@ -5,10 +5,4 @@ const router = express.Router()
 
 router.post('/', getAllDataInflux)
 
-// router.get('/', getAllWorkspaces);
-
-// router.post('/', getAllDevices);
-
-// router.get('/:id', getDataDevice);
-
 export default router
