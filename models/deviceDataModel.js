@@ -7,8 +7,8 @@ config({
     path: process.env.CONFIG_PATH || path.resolve(process.cwd(), '.env.vars'),
 });
 
-// mostrar todos los workspaces --> Desde la API de akenza
-// export const fetchWorkspaces = async () => {
+// mostrar todos los datos --> Desde API/influx
+export const getAllDataInflux = async () => {
 
 //     console.log(process.env.ID_ORGANIZACION);
 //     try {
@@ -28,7 +28,7 @@ config({
 //         console.error('Error en obtener datos de los workspace:', error.message);
 //         throw error;
 //     }
-// }
+}
 
 // mostrar todos los dispositivos --> Desde la API de akenza
 // export const fetchDevices = async (workspaceIds) => {

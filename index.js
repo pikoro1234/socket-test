@@ -13,6 +13,7 @@ import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
 import { appendInFile } from './services/functionsGenerics.js'
 import deviceRoutes from './routes/deviceRoute.js'
+import deviceDataRoutes from './routes/deviceDataRoute.js';
 
 
 
@@ -210,6 +211,7 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
 
 // Ruta para los colores
 app.post('/lights', verifyTokken, async (req, res) => {
+    console.log(req);
     try {
         const { red, green, blue, command } = req.body;
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
@@ -274,8 +276,9 @@ app.post('/lights', verifyTokken, async (req, res) => {
 
 /******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
-app.use('/devices', verifyTokken, deviceRoutes)
+app.use('/devices', verifyTokken, deviceRoutes);
 
+// app.use('/data-device', deviceDataRoutes);
 app.post('/data-device', async (req, res) => {
     let query_string = '';
     let query_range = '|> range(start: -1h)';

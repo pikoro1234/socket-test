@@ -1,7 +1,9 @@
 import express from 'express'
-import { getAllWorkspaces, getAllDevices, getDataDevice } from '../controllers/deviceDataController.js'
+import { getAllDataInflux } from '../controllers/deviceDataController.js';
 
 const router = express.Router()
+
+router.post('/', getAllDataInflux)
 
 // router.get('/', getAllWorkspaces);
 
