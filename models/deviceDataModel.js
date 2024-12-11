@@ -45,7 +45,7 @@ export const fetchDataInflux = async (objRequest) => {
             |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
             ${query_last}`;
 
-        // console.log(fluxQuery);
+        console.log(fluxQuery);
 
         queryApi.queryRows(fluxQuery, {
             next(row, tableMeta) {
