@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "doc": "apidoc -i ./ -o doc/"
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
@@ -22,11 +21,9 @@
     "jsonwebtoken": "9.0.2",
     "node-fetch": "3.3.2",
     "nodemon": "3.1.7",
+    "swagger-jsdoc": "6.2.8",
+    "swagger-ui-express": "5.0.1",
     "uid": "2.0.2",
     "ws": "^8.18.0"
-  },
-  "devDependencies": {
-    "apidoc": "^1.2.0",
-    "jsdoc": "^4.0.4"
   }
 }

@@ -4,15 +4,19 @@ import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';
-import fs from 'fs'
+import fs from 'fs';
 /********** refactoryn imports *********/
 import express from 'express';
 import cors from 'cors';
 import { sendMqttMessage } from './services/sendMqttGeneric.js';
 import { verifyTokken } from './services/generateTokken.js';
-import { appendInFile } from './services/functionsGenerics.js'
-import deviceRoutes from './routes/deviceRoute.js'
+import { appendInFile } from './services/functionsGenerics.js';
+import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
+
+// importaciones para generar documentacion
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swaggerConfig.js';
 
 
 
@@ -54,12 +58,15 @@ app.get('/', async (req, res) => {
         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
     }
 });
+
+// Ruta de Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // console.log(express.static(path.join(__dirname, 'doc')));
 // app.use('/doc', express.static(path.join(__dirname, 'doc')));
 
-app.get('/doc', (req, res) => {
-  res.sendFile(path.join(__dirname, 'doc', 'index.html'));
-});
+// app.get('/doc', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'doc', 'index.html'));
+// });
 
 // app.get('/doc', (req, res) => {
 //     res.redirect('/doc/index.html');
@@ -76,16 +83,16 @@ app.get('/doc', (req, res) => {
 //     }
 // });
 
-/**
- * @api {get} /user/:id Request User information
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users unique ID.
- *
- * @apiSuccess {String} firstname Firstname of the User.
- * @apiSuccess {String} lastname  Lastname of the User.
- */
+// /**
+//  * @api {get} /user/:id Request User information
+//  * @apiName GetUser
+//  * @apiGroup User
+//  *
+//  * @apiParam {Number} id Users unique ID.
+//  *
+//  * @apiSuccess {String} firstname Firstname of the User.
+//  * @apiSuccess {String} lastname  Lastname of the User.
+//  */
 app.get('/prueba', async (req, res) => {
     try {
         res.json({ mensaje: "hola mundo V.1.1" });
