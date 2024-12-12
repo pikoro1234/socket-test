@@ -7,8 +7,8 @@ export async function sendMqttMessage(topic, msg) {
             connectTimeout: 5 * 1000,
             reconnectPeriod: 0,
             clientId: "01234566-123455asr-22sfff",
-            username: process.env.MQTT_USERNAME,
-            password: process.env.MQTT_PASSWORD,
+            username: process.env.MQTT_USERNAME_F3,
+            password: process.env.MQTT_PASSWORD_F3,
         }
 
         // Configuracion de conexion a broker

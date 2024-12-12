@@ -237,15 +237,26 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
 
 // Ruta para los colores
 app.post('/lights', verifyTokken, async (req, res) => {
+    console.log(req.body);
+    let username = '';
+    let password = '';
+    let deviceId = '';
     try {
         const { red, green, blue, command } = req.body;
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
+        if(req.body.typeDevice === 'Franklin'){
+            username = process.env.MQTT_USERNAME_F4;
+            password = process.env.MQTT_PASSWORD_F4;
+            deviceId = process.env.MQTT_DEVICE_ID_F4;
+        }else{
+            username = process.env.MQTT_USERNAME_F3;
+            password = process.env.MQTT_PASSWORD_F3;
+            deviceId = process.env.MQTT_DEVICE_ID_F3;
+        }
+
         // Configuración para la conexión MQTT
         const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
-        const username = process.env.MQTT_USERNAME;
-        const password = process.env.MQTT_PASSWORD;
-        const deviceId = process.env.MQTT_DEVICE_ID;
         const topic = `${deviceId}`;
 
         var options = {
