@@ -54,6 +54,27 @@ app.get('/', async (req, res) => {
         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
     }
 });
+// console.log(express.static(path.join(__dirname, 'doc')));
+// app.use('/doc', express.static(path.join(__dirname, 'doc')));
+
+app.get('/doc', (req, res) => {
+  res.sendFile(path.join(__dirname, 'doc', 'index.html'));
+});
+
+// app.get('/doc', (req, res) => {
+//     res.redirect('/doc/index.html');
+// });
+
+
+
+// app.get('/documents', async (req, res) => {
+//     try {
+//         res.sendFile(path.join(__dirname, 'index.html'));
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
+//     }
+// });
 
 /**
  * @api {get} /user/:id Request User information
@@ -279,6 +300,21 @@ app.use('/devices', verifyTokken, deviceRoutes);
 
 // obtenemos los datos de influxDB data-device
 app.use('/data-device', deviceDataRoutes);
+
+// validacion y control del login MYQL/MONGO,etc
+
+// ruta documentacion
+// app.get('/doc', async (req, res) => {
+//     try {
+//         // res.sendFile(path.join(__dirname, 'doc', 'index.html'));
+//         res.sendFile(path.join(__dirname, 'index.html'));
+
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ error: 'Error en obtener la documentación' });
+//     }
+// });
+
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {

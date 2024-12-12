@@ -19,11 +19,14 @@
     "express": "4.21.1",
     "express-fileupload": "1.5.1",
     "http-proxy-middleware": "3.0.3",
-    "jsdoc": "4.0.4",
     "jsonwebtoken": "9.0.2",
     "node-fetch": "3.3.2",
     "nodemon": "3.1.7",
     "uid": "2.0.2",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "apidoc": "^1.2.0",
+    "jsdoc": "^4.0.4"
   }
 }
