@@ -9,8 +9,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3002', // Cambia esto por la URL de tu servidor
-      description: 'Servidor Local',
+      url: 'https://urbicomm.io/api/', // Cambia esto por la URL de tu servidor
+      description: 'Servidor de Producción',
     },
   ],
 };
