@@ -7,46 +7,16 @@ config({
     path: process.env.CONFIG_PATH || path.resolve(process.cwd(), '.env.vars'),
 });
 
-// mostrar todos los datos --> Desde API/influx
-export const fetchDataInflux = async (objRequest) => {
+// obtener datos de solana desde API/influx
+export const fetchDataSolanaInflux = async (bucket, device_uid, queryApi, query_range, query_string, query_last) => {
+    const response = [];
     return new Promise((resolve, reject) => {
-        let query_string = '';
-        let query_range = '|> range(start: -1h)';
-        let query_last = '|> last()';
-        let query_average = '|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)';
-        const response = [];
-        const token = process.env.TOKKEN_INFLUX_DB;
-        const org = process.env.ORGANIZACION_INFLUX_DB;
-        const bucket = objRequest.bucketType;
-        const device_uid = objRequest.deviceId;
-        const queryType = objRequest.queryType;
-        const url = `${process.env.URL_DOMAIN_INDEX_INFLUX_QUERY}?bucket=${bucket}&org=${org}`;
-        const influxDB = new InfluxDB({ url, token });
-        const queryApi = influxDB.getQueryApi(org);
-
-        if (queryType === 'franklin') {
-            query_string = '|> filter(fn: (r) => r._field == "temperatura" or r._field == "humedad" or r._field == "co2" or r._field == "pm1")';
-        } else if (queryType === 'solana') {
-            query_range = '|> range(start: -30d)';
-            query_string = '|> filter(fn: (r) => r._measurement == "Solana PRO") |> filter(fn: (r) => r._field == "humedad" or r._field == "temperatura")';
-        } else if (queryType === 'basic') {
-            query_range = '|> range(start: -1d)';
-            query_string = '|> filter(fn: (r) => r._measurement == "Basic") |> filter(fn: (r) => r._field == "magnitude" or r._field == "temperatura")';
-        }
-
-        if (objRequest.dateStart !== '' && objRequest.dateEnd !== '') {
-            query_range = `|> range(start: ${(Math.floor(new Date(objRequest.dateStart).getTime() / 1000))}, stop: ${(Math.floor(new Date(objRequest.dateEnd).getTime() / 1000))})`;
-            query_last = '';
-        }
-
         const fluxQuery = `
-            from(bucket: "${bucket}")
-            ${query_range}
-            ${query_string}
-            |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
-            ${query_last}`;
-
-        console.log(fluxQuery);
+        from(bucket: "${bucket}")
+        ${query_range}
+        ${query_string}
+        |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
+        ${query_last}`;
 
         queryApi.queryRows(fluxQuery, {
             next(row, tableMeta) {
@@ -62,5 +32,120 @@ export const fetchDataInflux = async (objRequest) => {
                 resolve(response);
             },
         });
-    });
-};
+    })
+}
+
+// obtener datos de franklin desde API/influx
+export const fetchDataFranklinInflux = async (bucket, device_uid, queryApi, query_range, query_string, query_last) => {
+    const response = [];
+    return new Promise((resolve, reject) => {
+        const fluxQuery = `
+        from(bucket: "${bucket}")
+        ${query_range}
+        ${query_string}
+        |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
+        ${query_last}`;
+
+        queryApi.queryRows(fluxQuery, {
+            next(row, tableMeta) {
+                const data = tableMeta.toObject(row);
+                response.push(data);
+            },
+            error(error) {
+                console.error('Error al leer los datos:', error);
+                reject({ error: "Error al obtener datos de InfluxDB", details: error });
+            },
+            complete() {
+                console.log('Consulta completada.');
+                resolve(response);
+            },
+        });
+    })
+}
+
+// obtener datos de basic desde API/influx
+export const fetchDataBasicInflux = async (bucket, device_uid, queryApi, query_range, query_string, query_last) => {
+    const response = [];
+    return new Promise((resolve, reject) => {
+        const fluxQuery = `
+        from(bucket: "${bucket}")
+        ${query_range}
+        ${query_string}
+        |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
+        ${query_last}`;
+
+        queryApi.queryRows(fluxQuery, {
+            next(row, tableMeta) {
+                const data = tableMeta.toObject(row);
+                response.push(data);
+            },
+            error(error) {
+                console.error('Error al leer los datos:', error);
+                reject({ error: "Error al obtener datos de InfluxDB", details: error });
+            },
+            complete() {
+                console.log('Consulta completada.');
+                resolve(response);
+            },
+        });
+    })
+}
+
+
+
+// mostrar todos los datos --> Desde API/influx
+// export const fetchDataInflux = async (objRequest) => {
+//     return new Promise((resolve, reject) => {
+//         let query_string = '';
+//         let query_range = '|> range(start: -1h)';
+//         let query_last = '|> last()';
+//         const response = [];
+//         const token = process.env.TOKKEN_INFLUX_DB;
+//         const org = process.env.ORGANIZACION_INFLUX_DB;
+//         const bucket = objRequest.bucketType;
+//         const device_uid = objRequest.deviceId;
+//         const queryType = objRequest.queryType;
+//         const url = `${process.env.URL_DOMAIN_INDEX_INFLUX_QUERY}?bucket=${bucket}&org=${org}`;
+//         const influxDB = new InfluxDB({ url, token });
+//         const queryApi = influxDB.getQueryApi(org);
+
+//         if (queryType === 'franklin') {
+//             query_string = '|> filter(fn: (r) => r._field == "temperatura" or r._field == "humedad" or r._field == "co2" or r._field == "pm1")';
+//         } else if (queryType === 'solana') {
+//             query_range = '|> range(start: -30d)';
+//             query_string = '|> filter(fn: (r) => r._measurement == "Solana PRO") |> filter(fn: (r) => r._field == "humedad" or r._field == "temperatura")';
+//         } else if (queryType === 'basic') {
+//             query_range = '|> range(start: -1d)';
+//             query_string = '|> filter(fn: (r) => r._measurement == "Basic") |> filter(fn: (r) => r._field == "magnitude" or r._field == "temperatura")';
+//         }
+
+//         if (objRequest.dateStart !== '' && objRequest.dateEnd !== '') {
+//             query_range = `|> range(start: ${objRequest.dateStart}, stop: ${(Math.floor(new Date(objRequest.dateEnd).getTime() / 1000))})`;
+//             query_last = '|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)';
+//         }
+
+//         const fluxQuery = `
+//             from(bucket: "${bucket}")
+//             ${query_range}
+//             ${query_string}
+//             |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
+//             ${query_last}`;
+
+//         console.log(fluxQuery);
+
+//         queryApi.queryRows(fluxQuery, {
+//             next(row, tableMeta) {
+//                 const data = tableMeta.toObject(row);
+//                 response.push(data);
+//             },
+//             error(error) {
+//                 console.error('Error al leer los datos:', error);
+//                 reject({ error: "Error al obtener datos de InfluxDB", details: error });
+//             },
+//             complete() {
+//                 console.log('Consulta completada.');
+//                 resolve(response);
+//             },
+//         });
+//     });
+// };
