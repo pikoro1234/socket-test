@@ -13,6 +13,7 @@ export const fetchDataInflux = async (objRequest) => {
         let query_string = '';
         let query_range = '|> range(start: -1h)';
         let query_last = '|> last()';
+        let query_average = '|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)';
         const response = [];
         const token = process.env.TOKKEN_INFLUX_DB;
         const org = process.env.ORGANIZACION_INFLUX_DB;

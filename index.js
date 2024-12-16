@@ -49,50 +49,6 @@ const fileSong = path.join(__dirname, 'songs-file.json');
 // Definir el puerto para el servidor
 const PORT = process.env.PORT || 3002;
 
-// Ruta principal
-app.get('/', async (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, 'index.html'));
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
-    }
-});
-
-// Ruta de Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// console.log(express.static(path.join(__dirname, 'doc')));
-// app.use('/doc', express.static(path.join(__dirname, 'doc')));
-
-// app.get('/doc', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'doc', 'index.html'));
-// });
-
-// app.get('/doc', (req, res) => {
-//     res.redirect('/doc/index.html');
-// });
-
-
-
-// app.get('/documents', async (req, res) => {
-//     try {
-//         res.sendFile(path.join(__dirname, 'index.html'));
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ error: 'Error en levantar el server en la ruta especifica' });
-//     }
-// });
-
-// /**
-//  * @api {get} /user/:id Request User information
-//  * @apiName GetUser
-//  * @apiGroup User
-//  *
-//  * @apiParam {Number} id Users unique ID.
-//  *
-//  * @apiSuccess {String} firstname Firstname of the User.
-//  * @apiSuccess {String} lastname  Lastname of the User.
-//  */
 app.get('/prueba', async (req, res) => {
     try {
         res.json({ mensaje: "hola mundo V.1.1" });
@@ -245,11 +201,11 @@ app.post('/lights', verifyTokken, async (req, res) => {
         const { red, green, blue, command } = req.body;
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
-        if(req.body.typeDevice === 'Franklin'){
+        if (req.body.typeDevice === 'Franklin') {
             username = process.env.MQTT_USERNAME_F4;
             password = process.env.MQTT_PASSWORD_F4;
             deviceId = process.env.MQTT_DEVICE_ID_F4;
-        }else{
+        } else {
             username = process.env.MQTT_USERNAME_F3;
             password = process.env.MQTT_PASSWORD_F3;
             deviceId = process.env.MQTT_DEVICE_ID_F3;
@@ -313,6 +269,19 @@ app.post('/lights', verifyTokken, async (req, res) => {
 /******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
 
+// ruta principal donde desplegamos todo lo visible en Urbicomm.io
+app.get('/', async (req, res) => {
+    try {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Error en levantar la pagina principal' });
+    }
+});
+
+// ruta donde presentaremos nuesta documentacion generadapor swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // obtenemos workspace/devices-for-workspace/config-params-device
 app.use('/devices', verifyTokken, deviceRoutes);
 
@@ -320,19 +289,22 @@ app.use('/devices', verifyTokken, deviceRoutes);
 app.use('/data-device', deviceDataRoutes);
 
 // validacion y control del login MYQL/MONGO,etc
+app.post('/login', (req, res) => {
+    try {
+        if (!req.body.username) {
+            res.status(404).json({ message: 'User/Password Not Found' });
+        }
 
-// ruta documentacion
-// app.get('/doc', async (req, res) => {
-//     try {
-//         // res.sendFile(path.join(__dirname, 'doc', 'index.html'));
-//         res.sendFile(path.join(__dirname, 'index.html'));
+        if (!req.body.userpassword) {
+            res.status(404).json({ message: 'User/Password Not Found' });
+        }
 
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ error: 'Error en obtener la documentación' });
-//     }
-// });
-
+        res.status(200).json({ message: 'login correct' })
+    } catch (error) {
+        console.log("error en la logica del login");
+        console.log(error);
+    }
+})
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
