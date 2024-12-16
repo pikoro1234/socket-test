@@ -18,6 +18,8 @@ export const fetchDataSolanaInflux = async (bucket, device_uid, queryApi, query_
         |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
         ${query_last}`;
 
+        console.log(fluxQuery);
+
         queryApi.queryRows(fluxQuery, {
             next(row, tableMeta) {
                 const data = tableMeta.toObject(row);
