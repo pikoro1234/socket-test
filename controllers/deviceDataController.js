@@ -27,15 +27,33 @@ export const getAllDataInflux = async (req, res) => {
 
             // validamos que tipo de device es quien pide los datos para obtener un modelo u otro
             if (req.body.queryType === 'solana') {
-                const query_string_temperatura = '|> filter(fn: (r) => r._measurement == "Solana PRO") |> filter(fn: (r) => r._field == "temperatura")';
-                const query_string_humedad = '|> filter(fn: (r) => r._measurement == "Solana PRO") |> filter(fn: (r) => r._field == "humedad")';
+                // 29a71256cb3e82ed pro workspaceId
+                const query_measurement = (req.body.workspaceId === '29a71256cb3e82ed') ? 'Solana PRO' : 'Solana PRE'
+                const query_string_temperatura = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "temperatura")`;
+                const query_string_humedad = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "humedad")`;
+                const query_string_batteria = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "vBatt")`;
+                const query_string_pannel = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "vPannel")`;
+                const query_string_duration = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "duration")`;
+                const query_string_deposito = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "agua")`;
+                const query_string_puerta = `|> filter(fn: (r) => r._measurement == "${query_measurement}") |> filter(fn: (r) => r._field == "puerta")`;
 
                 const dataTemperaturaSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_temperatura, query_last);
                 const dataHumedadSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_humedad, query_last);
+                const dataBatteriaSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_batteria, query_last);
+                const dataPannelSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_pannel, query_last);
+                const dataDurationSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_duration, query_last);
+                const dataDepositoSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_deposito, query_last);
+                const dataPuertaSolana = await fetchDataSolanaInflux(bucket, device_uid, queryApi, query_range, query_string_puerta, query_last);
+
                 res.status(200).json(
                     {
                         temperatura: dataTemperaturaSolana,
-                        humedad: dataHumedadSolana
+                        humedad: dataHumedadSolana,
+                        batteria: dataBatteriaSolana,
+                        pannel: dataPannelSolana,
+                        durattion: dataDurationSolana,
+                        deposito: dataDepositoSolana,
+                        puerta: dataPuertaSolana
                     }
                 );
 
