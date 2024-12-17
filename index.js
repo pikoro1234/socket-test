@@ -152,6 +152,7 @@ app.get('/read-upload-music', verifyTokken, (req, res) => {
 // Ruta donde recibimos audios
 app.post('/audio', verifyTokken, async (req, res) => {
     console.log(req.body);
+    let deviceId = '';
     try {
         const { command, file } = req.body;
         const body = {
@@ -159,7 +160,13 @@ app.post('/audio', verifyTokken, async (req, res) => {
             "file": `${process.env.URL_SERVER}/uploads/${file.name}`
         };
 
-        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
+        if (req.body.typeDevice === 'Franklin') {
+            deviceId = process.env.MQTT_DEVICE_AUDIO_F3;
+        }else{
+            deviceId = process.env.MQTT_DEVICE_AUDIO_F4;
+        }
+
+        await sendMqttMessage(deviceId, body);
 
         // Responder al cliente una vez que se haya enviado el mensaje
         res.status(200).json({ message: 'Audio enviado correctamente' });

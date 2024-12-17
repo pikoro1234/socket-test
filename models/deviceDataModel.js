@@ -47,6 +47,8 @@ export const fetchDataFranklinInflux = async (bucket, device_uid, queryApi, quer
         ${query_string}
         |> filter(fn: (r) => r.akenzaDeviceId == "${device_uid}")
         ${query_last}`;
+        
+        console.log(fluxQuery);
 
         queryApi.queryRows(fluxQuery, {
             next(row, tableMeta) {
