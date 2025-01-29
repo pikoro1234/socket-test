@@ -17,6 +17,7 @@ import deviceDataRoutes from './routes/deviceDataRoute.js';
 // importaciones para generar documentacion
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swaggerConfig.js';
+import { CLIENT_RENEG_WINDOW } from 'tls';
 
 
 
@@ -162,7 +163,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
 
         if (req.body.typeDevice === 'Franklin') {
             deviceId = process.env.MQTT_DEVICE_AUDIO_F3;
-        }else{
+        } else {
             deviceId = process.env.MQTT_DEVICE_AUDIO_F4;
         }
 
@@ -178,6 +179,233 @@ app.post('/audio', verifyTokken, async (req, res) => {
         }
     }
 })
+
+
+//**************************************************************** */
+const query_data = async (id_device) => {
+    try {
+        const response = await fetch(`https://api.akenza.io/v3/devices/by-device-id?deviceId=${id_device}A`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
+            }
+        })
+        if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
+        const result = await response.json();
+        return result
+
+    } catch (error) {
+        console.error('Error en obtener datos de los workspace:', error.message);
+        throw error;
+    }
+}
+
+const mqttMessageEnvio = async (username, password, port, topic, msg) => {
+    try {
+        // Opciones para la conexion
+        const options = {
+            connectTimeout: 5 * 1000,
+            reconnectPeriod: 5000,
+            // clientId: "01234566-123455asr-22sfff",
+            clientId: `client_${Math.random().toString(16).slice(2)}`,
+            username: username,
+            password: password,
+        }
+
+        // Configuracion de conexion a broker
+        const client = await mqtt.connectAsync(
+            `tls://${process.env.MQTT_BROKER_URL}:8883`,
+            options,
+            false
+        )
+
+        // Manejar errores de conexión
+        client.on('error', (err) => {
+            console.log(`Error al enviar los datos a broker: ${err}`);
+        });
+
+        // Publicar el mensaje en el topic
+        await client.publish(topic, JSON.stringify(msg));
+
+        // Cerrar la conexión
+        await client.end();
+
+    } catch (error) {
+        console.error(`Error: ${error.stack}`);
+        console.error(`ErrorComplet: ${error}`);
+    }
+}
+
+app.post('/save-data-device', verifyTokken, async (req, res) => {
+    if (req.body.value[ 0 ]) {
+        const response = await query_data(req.body.id_device)
+        response.customFields.map(async (value, index) => {
+            if (value.meta.name === 'Config') {
+                if (req.body.key === 'status') {
+                    let mqtt_usr = value.JSON.mqtt.user
+                    let mqtt_psw = value.JSON.mqtt.psw
+                    let mqtt_port = value.JSON.mqtt.port
+                    let mqtt_topic = value.JSON.mqtt.uplink_topic
+                    let msg = {
+                        "puerta": ((req.body.value[ 0 ].status.door_open) || (req.body.value[ 0 ].status.door_open === 'true')) ? 1 : 0,
+                        "vPannel": req.body.value[ 0 ].status.vpv,
+                        "tiempo": req.body.value[ 0 ].status.ts,
+                        "vBatt": req.body.value[ 0 ].status.vbatt,
+                        "temperatura": req.body.value[ 0 ].status.soil_temperature_c,
+                        "humedad": req.body.value[ 0 ].status.soil_moisture_vwc,
+                        "agua": ((req.body.value[ 0 ].status.level_low) || (req.body.value[ 0 ].status.level_low === 'true')) ? 1 : 0,
+                        "id_sensor_status": req.body.value[ 0 ].id
+                    }
+                    mqttMessageEnvio(mqtt_usr, mqtt_psw, mqtt_port, mqtt_topic + "/status", msg)
+                    res.status(200).json(req.body.value[ 0 ]);
+                } else if (req.body.key === 'events') {
+                    let mqtt_usr = value.JSON.mqtt.user
+                    let mqtt_psw = value.JSON.mqtt.psw
+                    let mqtt_port = value.JSON.mqtt.port
+                    let mqtt_topic = value.JSON.mqtt.uplink_topic
+                    req.body.value.map((element, index) => {
+                        let msg = {
+                            "timeStamp": element.ts,
+                            "idSensor": element.id,
+                            "idevent": element.idevent,
+                            "value": element.value,
+                            "extradata": element.extradata
+                        }
+                        mqttMessageEnvio(mqtt_usr, mqtt_psw, mqtt_port, mqtt_topic + "/events", msg)
+                    })
+                    res.status(200).json({ "result": true, "reason": null });
+                } else if (req.body.key === 'irrigations') {
+                    let mqtt_usr = value.JSON.mqtt.user
+                    let mqtt_psw = value.JSON.mqtt.psw
+                    let mqtt_port = value.JSON.mqtt.port
+                    let mqtt_topic = value.JSON.mqtt.uplink_topic
+                    req.body.value.map((element, index) => {
+                        let msg = {
+                            "idSensor": req.body.id_device,
+                            "irrigationId": element.irrigationid,
+                            "start": element.start,
+                            "end": element.end,
+                            "duration": element.duration,
+                            "vBatt": element.vbatt,
+                            "vPump": element.vpump,
+                            "iPump": element.ipump,
+                            "initial_sm_vwc": element.initial_sm_vwc,
+                            "final_sm_vwc": element.final_sm_vwc,
+
+                        }
+                        mqttMessageEnvio(mqtt_usr, mqtt_psw, mqtt_port, mqtt_topic + "/irrigations", msg)
+                    })
+                    res.status(200).json({ "result": true, "reason": null });
+                } else if (req.body.key === 'canceled_irrigations') {
+                    let mqtt_usr = value.JSON.mqtt.user
+                    let mqtt_psw = value.JSON.mqtt.psw
+                    let mqtt_port = value.JSON.mqtt.port
+                    let mqtt_topic = value.JSON.mqtt.uplink_topic
+                    req.body.value.map((element, index) => {
+                        let msg = {
+                            "idSensor": req.body.id_device,
+                            "textReason": req.body.text_reason,
+                            "valueReason": req.body.value_reason,
+                            "humedad": element.status.soil_moisture_vwc,
+                            "temperatura": element.status.soil_temperature_c,
+                            "vBatt": element.status.vbatt,
+                            "vPannel": element.status.vpv,
+                        }
+                        console.log(msg);
+                        mqttMessageEnvio(mqtt_usr, mqtt_psw, mqtt_port, mqtt_topic + "/canceled_irrigations", msg)
+                    })
+                    res.status(200).json({ "result": true, "reason": null });
+                }
+            }
+        })
+    }
+})
+
+app.post('/get-data-device', verifyTokken, async (req, res) => {
+    try {
+        const response = await fetch(`https://api.akenza.io/v3/devices/by-device-id?deviceId=${req.body.id_device}A`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
+            }
+        })
+        if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
+        const result = await response.json();
+
+        if (req.body.query_string === 'coordenadas') {
+            result.customFields.map((value, index) => {
+                if (value.meta.name === 'Cordenadas') {
+                    console.log(value);
+                    res.status(200).json(value.GPS_COORDINATES);
+                }
+            })
+        } else if (req.body.query_string === 'params') {
+            result.customFields.map((value, index) => {
+                if (value.meta.name === 'Params') {
+                    console.log(value.JSON);
+                    res.status(200).json(value.JSON);
+                }
+            })
+        } else if (req.body.query_string === 'config') {
+            result.customFields.map((value, index) => {
+                if (value.meta.name === 'Config') {
+                    console.log(value.JSON);
+                    res.status(200).json(value.JSON);
+                }
+            })
+        } else {
+            res.status(200).json(result);
+        }
+
+    } catch (error) {
+        console.error('Error en obtener datos de los workspace:', error.message);
+        throw error;
+    }
+})
+
+app.post('/get-city-code', verifyTokken, async (req, res) => {
+    let obj_response = { "rainMillimeter": null, "rainProbability": null }
+    try {
+        const response = await fetch(`http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=URwZc0quyomWgM6icmitYSl5sl2MRJQi&q=${req.body.latitude},${req.body.longitude}&language=es-ES&details=true`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
+        const result = await response.json();
+
+        const data_response = await fetch(`http://dataservice.accuweather.com/forecasts/v1/daily/5day/${result.Details.Key}?apikey=URwZc0quyomWgM6icmitYSl5sl2MRJQi&language=es-ES&details=true`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!data_response.ok) { throw new Error(`Error con la API : ${data_response.statusText}`); }
+        const values_api = await data_response.json();
+        const currentDate = new Date();
+        const currentHour = currentDate.getHours(); // Obtenemos la hora en formato 24h para poder acceder a key Day/Night
+        if (currentHour >= 17) {
+            obj_response = {
+                "rainMillimeter": parseFloat(values_api.DailyForecasts[ 1 ].Night.Rain.Value) * 25.4,
+                "rainProbability": values_api.DailyForecasts[ 1 ].Night.RainProbability
+            }
+        } else {
+            obj_response = {
+                "rainMillimeter": parseFloat(values_api.DailyForecasts[ 1 ].Day.Rain.Value) * 25.4,
+                "rainProbability": values_api.DailyForecasts[ 1 ].Day.RainProbability
+            }
+        }
+
+    } catch (error) {
+        console.error('Error en obtener datos de los workspace:', error.message);
+        throw error;
+    }
+    res.status(200).json(obj_response);
+})
+//**************************************************************** */
 
 // Ruta trigger sons de farolas
 app.get('/time-song-trigger', verifyTokken, (req, res) => {
@@ -292,7 +520,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // obtenemos workspace/devices-for-workspace/config-params-device
 app.use('/devices', verifyTokken, deviceRoutes);
 
-// obtenemos los datos de influxDB data-device
+// obtenemos los datos de influxDB
 app.use('/data-device', deviceDataRoutes);
 
 // validacion y control del login MYQL/MONGO,etc
