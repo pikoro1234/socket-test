@@ -521,7 +521,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/devices', verifyTokken, deviceRoutes);
 
 // obtenemos los datos de influxDB
-app.use('/data-device', deviceDataRoutes);
+app.use('/data-device', verifyTokken, deviceDataRoutes);
 
 // validacion y control del login MYQL/MONGO,etc
 app.post('/login', (req, res) => {

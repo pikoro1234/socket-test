@@ -2,11 +2,12 @@ import { InfluxDB } from '@influxdata/influxdb-client';
 import { fetchDataModelDevices } from '../models/deviceDataModel.js';
 
 export const getAllDataInflux = async (req, res) => {
+    console.log(req.body);
     if (!req.header('Authorization')) { return res.status(403).json({ error: 'Token requerido' }) };
 
     try {
         if (!req.body.deviceId) { return res.status(404).json({ message: 'Device id Required' }); }
-        if (!req.body.bucketType) { return res.status(404).json({ message: 'Buccket Required' }); }
+        if (!req.body.bucketType) { return res.status(404).json({ message: 'Bucket Required' }); }
         if (!req.body.queryType) { return res.status(404).json({ message: 'QueryType Required' }); }
         if (!req.body.querySet) { return res.status(404).json({ message: 'QuerySet Required' }); }
 
