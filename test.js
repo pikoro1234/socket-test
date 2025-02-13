@@ -1,73 +1,53 @@
-// import WebSocket from 'ws';
+/**
+ * Example to send an uplink via MQTT using TLS for a device.
+ */
+import mqtt from "async-mqtt";
+import { config } from "dotenv";
+import path from "path";
+config({
+    path: process.env.CONFIG_PATH || path.resolve(process.cwd(), ".env"),
+});
 
-// const ws = new WebSocket('wss://urbicomm.io/ws', {
-//     rejectUnauthorized: false, // Desactiva la verificación de certificados
-//   });
-  
-//   ws.onopen = () => {
-//     console.log('Conexión abierta.');
-//     ws.send('Hola servidor WebSocket');
-//   };
-  
-//   ws.onmessage = (event) => {
-//     console.log('Mensaje recibido:', event);
-//   };
-  
-//   ws.onclose = () => {
-//     console.log('Conexión cerrada.');
-//   };
-  
-//   ws.onerror = (error) => {
-//     console.error('Error en WebSocket:', error);
-//   };
-  
+const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+const username = "07255b7857c33575";
+const password = "4v1bpt5ff72v3vp35k8h7lupj6fqj8gl";
+const deviceId = "930969E35F535D1F";
+const topic = `/up/${password}/id/${deviceId}/#`;
 
-// import WebSocket from "ws";
+const options = {
+    connectTimeout: 5000,
+    reconnectPeriod: 1000, // Intenta reconectar cada 1s si hay desconexión
+    clientId: `akenza-client-${Math.random().toString(16).substr(2, 8)}`,
+    username: username,
+    password: password,
+};
 
-// // URL del WebSocket al que te quieres conectar
-// const wsUrl = "ws://urbicomm.io:8080"; // Cambia a la URL correspondiente (puede ser wss://urbicomm.io/ws si es seguro)
+async function connectMqtt() {
+    try {
+        console.log("🔌 Conectando a MQTT Broker...");
+        const client = await mqtt.connectAsync(`tls://${mqttBrokerUrl}:8883`, options);
 
-// const ws = new WebSocket(wsUrl);
+        console.log("✅ Conectado a MQTT Broker!");
 
-// // Evento: Conexión abierta
-// ws.on("open", () => {
-//   console.log("Conexión al WebSocket abierta.");
+        // ✅ Suscribirse al topic para recibir datos
+        await client.subscribe(topic);
+        console.log(`📡 Suscrito al topic: ${topic}`);
 
-//   // Si necesitas enviar un mensaje al conectarte
-//   ws.send("Hola servidor WebSocket, estoy conectado.");
-// });
+        // 📩 Escuchar los mensajes que llegan al topic
+        client.on("message", (receivedTopic, message) => {
+            console.log(`📩 Mensaje recibido en ${receivedTopic}:`, message.toString());
+        });
 
-// // Evento: Mensaje recibido del servidor
-// ws.on("message", (data) => {
-//   console.log("Mensaje recibido desde el WebSocket:", JSON.parse(data));
-// });
+        // ✅ Publicar un mensaje de prueba
+        const body = { co2: 780 };
+        await client.publish(topic, JSON.stringify(body));
+        console.log(`✅ Mensaje publicado en ${topic}:`, body);
 
-// // Evento: Conexión cerrada
-// ws.on("close", (code, reason) => {
-//   console.log(`Conexión cerrada. Código: ${code}, Razón: ${reason}`);
-// });
+        return client;
+    } catch (error) {
+        console.error("❌ Error al conectar a MQTT:", error);
+    }
+}
 
-// // Evento: Error en la conexión
-// ws.on("error", (error) => {
-//   console.error("Error en la conexión WebSocket:", error);
-// });
-
-
-// import { WebSocketServer } from "ws";
-
-// const wss = new WebSocketServer({ port: 8080 }); // 🚀 Servidor en el puerto 8081
-
-// wss.on("connection", (ws) => {
-//     console.log("🌍 Cliente conectado al WebSocket");
-
-//     ws.on("message", (message) => {
-//         console.log("📨 Mensaje recibido:", message.toString());
-//         ws.send(`📩 Respuesta desde el servidor: ${message.toString()}`);
-//     });
-
-//     ws.on("close", () => {
-//         console.log("❌ Cliente WebSocket desconectado");
-//     });
-// });
-
-// console.log("🚀 Servidor WebSocket corriendo en ws://localhost:8081");
+// Iniciar la conexión MQTT
+connectMqtt();

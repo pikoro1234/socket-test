@@ -9,12 +9,17 @@ config({
 
 // obtener datos solana/franklin/basic desde --> API/influx
 export const fetchDataModelDevices = async (queryApi, bucket, startDate, endDate, querySet, deviceId) => {
+
+    // para obtener todos los datos sin discriminar measurement
+    let querySetMeasurementFormat = (querySet === '') ? '' : `|> filter(fn: (r) => r._measurement == "${querySet}")`;
+    
     const response = [];
     return new Promise((resolve, reject) => {
         const fluxQuery = `from(bucket: "${bucket}")
         |> range(start: ${startDate}, stop: ${endDate})
-        |> filter(fn: (r) => r._measurement == "${querySet}")
-        |> filter(fn: (r) => r.deviceId == "${deviceId}")`;
+        ${querySetMeasurementFormat}
+        |> filter(fn: (r) => r.deviceId == "${deviceId}")
+        |> sort(columns: ["_time"], desc: false)`;
 
         console.log(fluxQuery);
 

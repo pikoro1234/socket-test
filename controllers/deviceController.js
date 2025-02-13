@@ -38,6 +38,6 @@ export const getDataDevice = async (req, res) => {
         res.status(200).json({ message: 'Detalles del dispositivo completo.', dataDevice })
 
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener datos del dispositivo.', error: error.message });
+        res.status(500).json({ message: 'Error al obtener datos del dispositivos.', error: error.message });
     }
 }

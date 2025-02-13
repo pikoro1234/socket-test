@@ -9,7 +9,6 @@ export const getAllDataInflux = async (req, res) => {
         if (!req.body.deviceId) { return res.status(404).json({ message: 'Device id Required' }); }
         if (!req.body.bucketType) { return res.status(404).json({ message: 'Bucket Required' }); }
         if (!req.body.queryType) { return res.status(404).json({ message: 'QueryType Required' }); }
-        if (!req.body.querySet) { return res.status(404).json({ message: 'QuerySet Required' }); }
 
         // parametros de configuracion influx
         const token = process.env.TOKKEN_INFLUX_DB;

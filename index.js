@@ -17,11 +17,6 @@ import deviceDataRoutes from './routes/deviceDataRoute.js';
 // importaciones para generar documentacion
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swaggerConfig.js';
-import { CLIENT_RENEG_WINDOW } from 'tls';
-
-
-
-
 
 // Cargar las variables de entorno
 config({
@@ -501,6 +496,12 @@ app.post('/lights', verifyTokken, async (req, res) => {
     }
 })
 
+
+app.get('/testeando', (req,res)=> {
+    console.log(req);
+    res.json({message:"compelte"});
+})
+
 /******************+ NUEVA FUNCIONALIDAD PARA API REST FULL +***************/
 // Desplegamos nueva logica con separacion de funciones
 
@@ -520,7 +521,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // obtenemos workspace/devices-for-workspace/config-params-device
 app.use('/devices', verifyTokken, deviceRoutes);
 
-// obtenemos los datos de influxDB
+// obtenemos todos los devices sin importar workspace 
+app.use('/devices', verifyTokken, deviceRoutes);
+
+// obtenemos los datos de influxDB /single-device-data
 app.use('/data-device', verifyTokken, deviceDataRoutes);
 
 // validacion y control del login MYQL/MONGO,etc

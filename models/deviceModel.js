@@ -30,6 +30,8 @@ export const fetchWorkspaces = async () => {
 
 // mostrar todos los dispositivos --> Desde la API de akenza
 export const fetchDevices = async (workspaceIds) => {
+
+    console.log(`MODEL ${typeof workspaceIds}`);
     try {
         const response = await fetch('https://api.akenza.io/v3/assets/list', {
             method: 'POST',
@@ -43,6 +45,7 @@ export const fetchDevices = async (workspaceIds) => {
             }),
         })
 
+        console.log(response);
         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
 
         return await response.json();
