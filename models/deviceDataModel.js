@@ -1,4 +1,3 @@
-import { InfluxDB } from '@influxdata/influxdb-client';
 import { config } from 'dotenv';
 import path from 'path';
 
@@ -7,20 +6,17 @@ config({
     path: process.env.CONFIG_PATH || path.resolve(process.cwd(), '.env.vars'),
 });
 
-// obtener datos solana/franklin/basic desde --> API/influx
-export const fetchDataModelDevices = async (queryApi, bucket, startDate, endDate, querySet, deviceId) => {
-
-    // para obtener todos los datos sin discriminar measurement
-    let querySetMeasurementFormat = (querySet === '') ? '' : `|> filter(fn: (r) => r._measurement == "${querySet}")`;
-    
+// obtener datos solana/franklin/basic desde --> API/influx ** REFACTORING
+export const fetchDataModelDevices = async (queryApi, bucket, startDate, endDate, deviceId) => {
     const response = [];
     return new Promise((resolve, reject) => {
         const fluxQuery = `from(bucket: "${bucket}")
-        |> range(start: ${startDate}, stop: ${endDate})
-        ${querySetMeasurementFormat}
+        |> range(start: ${startDate}, stop: ${endDate}T23:50:00Z)
+        |> filter(fn: (r) => r._measurement != "traces")
         |> filter(fn: (r) => r.deviceId == "${deviceId}")
         |> sort(columns: ["_time"], desc: false)`;
 
+        // print query debug
         console.log(fluxQuery);
 
         queryApi.queryRows(fluxQuery, {

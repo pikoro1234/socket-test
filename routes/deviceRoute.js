@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllWorkspaces, getAllDevices, getDataDevice } from '../controllers/deviceController.js'
+import { getAllDevices, getDataDevice, getAllDevicesNoFilter } from '../controllers/deviceController.js'
 
 const router = express.Router()
 
@@ -196,10 +196,10 @@ const router = express.Router()
  *                   example: "No autorizado. Token de autorización requerido."
  */
 
-router.get('/', getAllWorkspaces);
-
-router.post('/', getAllDevices);
+router.post('/all-workspace', getAllDevicesNoFilter);
 
 router.get('/:id', getDataDevice);
+
+router.post('/', getAllDevices);
 
 export default router

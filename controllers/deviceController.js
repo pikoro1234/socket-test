@@ -1,15 +1,4 @@
-import { fetchWorkspaces, fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
-
-export const getAllWorkspaces = async (req, res) => {
-    try {
-        const dataWorkspace = await fetchWorkspaces();
-
-        res.status(200).json({ message: 'Listado de workspace completo.', dataWorkspace })
-
-    } catch (error) {
-        res.status(500).json({ message: 'Error al obtener datos de los workspace.', error: error.message });
-    }
-}
+import { fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
 
 export const getAllDevices = async (req, res) => {
     try {
@@ -39,5 +28,20 @@ export const getDataDevice = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener datos del dispositivos.', error: error.message });
+    }
+}
+
+export const getAllDevicesNoFilter = async (req, res) => {
+    try {
+        const workspaceIds = req.body.workspaceIds
+
+        const devices = await fetchDevices(workspaceIds);
+
+        console.log(devices);
+
+        res.status(200).json({ message: 'Todos los dispositivos.', devices });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener todos los dispositivos.', error: error.message });
     }
 }

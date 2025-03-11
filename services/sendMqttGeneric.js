@@ -34,3 +34,58 @@ export async function sendMqttMessage(topic, msg) {
         console.error(`ErrorComplet: ${error}`);
     }
 }
+
+export async function sendMqttPrompt(prompt) {
+    return new Promise((resolve, reject) => {
+        const client = mqtt.connect(process.env.MQTT_BROKER_LOCAL);
+        let lastResponse = null;
+        const query = JSON.stringify({ "prompt": prompt })
+
+        client.on("connect", () => {
+            console.log("✅ Conectado a MQTT");
+
+            // 📩 Esperar respuesta
+            client.subscribe("/model_response", (err) => {
+                if (err) {
+                    client.end();
+                    console.log(err);
+                    return reject({ status: "error", message: "Error al suscribirse al topic de respuesta" })
+                }
+            })
+
+            // 📩 Enviar consulta
+            client.publish("/prompt", query, (err) => {
+                if (err) {
+                    client.end();
+                    return reject({ status: "error", message: "Error enviando mensaje a MQTT" });
+                }
+                console.log("📨 Mensaje enviado a broker:", prompt);
+            });
+            // });
+        });
+
+        // 📥 Escuchar respuesta del modelo
+        client.on("message", (topic, message) => {
+            if (topic === process.env.MQTT_BROKER_LOCAL_RESPONSE) {
+                lastResponse = message.toString();
+                console.log("✅ Respuesta recibida:", lastResponse);
+                try {
+                    const parsedMessage = JSON.parse(lastResponse);
+                    resolve({ status: "success", data: parsedMessage });
+                } catch (error) {
+                    resolve({ status: "error", message: "Respuesta inválida de MQTT" });
+                }
+                client.end();
+            }
+        });
+
+        // ⏳ Timeout si no hay respuesta en 20 segundos
+        setTimeout(() => {
+            if (!lastResponse) {
+                console.log("⏳ Timeout: No se recibió respuesta");
+                client.end();
+                reject({ status: "timeout", message: "No se recibió respuesta vuelve a intentarlo" });
+            }
+        }, 50000);
+    });
+}
