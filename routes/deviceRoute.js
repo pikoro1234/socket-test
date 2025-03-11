@@ -196,7 +196,7 @@ const router = express.Router()
  *                   example: "No autorizado. Token de autorización requerido."
  */
 
-router.post('/all-workspace', getAllDevicesNoFilter);
+router.post('/all-devices-workspaces', getAllDevicesNoFilter);
 
 router.get('/:id', getDataDevice);
 

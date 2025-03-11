@@ -58,7 +58,7 @@ app.use('/devices', verifyTokken, deviceRoutes);
 app.use('/data-device', verifyTokken, deviceDataRoutes);
 
 // data influx IA
-app.post('/data-ia/influx', async (req, res) => {
+app.post('/data-ia/processing', async (req, res) => {
     const { prompt } = req.body;
     // logica de validacion inyect scripts 
     try {
