@@ -1,8 +1,8 @@
 import { InfluxDB } from '@influxdata/influxdb-client';
 import { fetchDataModelDevices } from '../models/deviceDataModel.js';
 import { convert_data_solana, convert_data_basic, convert_data_franklin } from '../services/functionsGenerics.js';
+import { sendMqttPrompt } from '../services/sendMqttGeneric.js';
 
-// ** REFACTORING
 export const getAllDataInflux = async (req, res) => {
 
     if (!req.header('Authorization')) { return res.status(403).json({ error: 'Token requerido' }) };
@@ -32,15 +32,37 @@ export const getAllDataInflux = async (req, res) => {
 
         // traducimos respuesta para devolver al front transformado Solana/Basic/Franklin
         if (queryType === 'Solana') {
+
             return res.status(200).json(convert_data_solana(dataResponse))
+
         } else if (queryType === 'Basic') {
+
             return res.status(200).json(convert_data_basic(dataResponse))
+
         } else {
+
             return res.status(200).json(convert_data_franklin(dataResponse))
         }
-        // return res.status(200).json({ data: dataResponse })
 
     } catch (error) {
+
         res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+}
+
+export const getResponseIa = async (req, res) => {
+    const { prompt } = req.body;
+    try {
+
+        if (prompt === '') return res.status(400).json({ status: "error", message: "text required" })
+
+        const response = await sendMqttPrompt(prompt);
+
+        return res.json(response);
+
+    } catch (error) {
+
+        console.log("entramos al catch");
+        return res.status(500).json({ status: "error", message: error });
     }
 }

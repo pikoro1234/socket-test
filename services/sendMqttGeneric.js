@@ -42,9 +42,9 @@ export async function sendMqttPrompt(prompt) {
         const query = JSON.stringify({ "prompt": prompt })
 
         client.on("connect", () => {
-            console.log("✅ Conectado a MQTT");
+            console.log("Conectado a MQTT");
 
-            // 📩 Esperar respuesta
+            // Esperar respuesta
             client.subscribe("/model_response", (err) => {
                 if (err) {
                     client.end();
@@ -53,22 +53,22 @@ export async function sendMqttPrompt(prompt) {
                 }
             })
 
-            // 📩 Enviar consulta
+            // Enviar consulta
             client.publish("/prompt", query, (err) => {
                 if (err) {
                     client.end();
                     return reject({ status: "error", message: "Error enviando mensaje a MQTT" });
                 }
-                console.log("📨 Mensaje enviado a broker:", prompt);
+                console.log("Mensaje enviado a broker:", prompt);
             });
             // });
         });
 
-        // 📥 Escuchar respuesta del modelo
+        // Escuchar respuesta del modelo
         client.on("message", (topic, message) => {
             if (topic === process.env.MQTT_BROKER_LOCAL_RESPONSE) {
                 lastResponse = message.toString();
-                console.log("✅ Respuesta recibida:", lastResponse);
+                console.log("Respuesta recibida:", lastResponse);
                 try {
                     const parsedMessage = JSON.parse(lastResponse);
                     resolve({ status: "success", data: parsedMessage });
@@ -79,10 +79,10 @@ export async function sendMqttPrompt(prompt) {
             }
         });
 
-        // ⏳ Timeout si no hay respuesta en 20 segundos
+        // Timeout si no hay respuesta en 20 segundos
         setTimeout(() => {
             if (!lastResponse) {
-                console.log("⏳ Timeout: No se recibió respuesta");
+                console.log("Timeout: No se recibió respuesta");
                 client.end();
                 reject({ status: "timeout", message: "No se recibió respuesta vuelve a intentarlo" });
             }

@@ -1,4 +1,4 @@
-// data solana format ** REFACTORING
+// data solana format
 export const convert_data_solana = (dataDiccionary) => {
     const array_humedad = []
     const array_temperatura = []
@@ -44,7 +44,7 @@ export const convert_data_solana = (dataDiccionary) => {
     }
 }
 
-// data basic format ** REFACTORING
+// data basic format
 export const convert_data_basic = (dataDiccionary) => {
     const array_impact = []
     const array_temperature = []
@@ -74,7 +74,6 @@ export const convert_data_basic = (dataDiccionary) => {
             array_charger2.push(response_item);
         }
 
-        // charging_started charging_power_changed  charging_stopped
         if (masurement === 'charger1' && field === 'event' && (valor === 'charging_started' || valor === 'charging_power_changed' || valor === 'charging_stopped')) {
             const response_item = { fecha, valor, field };
             array_status_charger1.push(response_item);
@@ -94,7 +93,7 @@ export const convert_data_basic = (dataDiccionary) => {
     }
 }
 
-// data franklin format ** REFACTORING
+// data franklin format
 export const convert_data_franklin = (dataDiccionary) => {
     const array_humidity = []
     const array_temperature = []
