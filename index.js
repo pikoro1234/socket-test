@@ -8,6 +8,8 @@ import workspaceRoutes from './routes/workspaceRoute.js';
 import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
 
+import { sendMqttPrompt } from './services/sendMqttGeneric.js';
+
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swaggerConfig.js';
@@ -57,7 +59,22 @@ app.use('/devices', verifyTokken, deviceRoutes);
 app.use('/data-device', verifyTokken, deviceDataRoutes);
 
 // data influx IA
-app.post('/data-ia/processing', verifyTokken, deviceDataRoutes);
+app.post('/data-ia/processing', async (req, res) => {
+    const { prompt } = req.body;
+    try {
+
+        if (prompt === '') return res.status(400).json({ status: "error", message: "text required" })
+
+        const response = await sendMqttPrompt(prompt);
+
+        return res.json(response);
+
+    } catch (error) {
+
+        console.log("entramos al catch");
+        return res.status(500).json({ status: "error", message: error });
+    }
+})
 
 // validacion y control del login MYQL/MONGO,etc
 app.post('/login', (req, res) => {

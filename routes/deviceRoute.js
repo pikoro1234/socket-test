@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllDevices, getDataDevice, getAllDevicesNoFilter } from '../controllers/deviceController.js'
+import { getAllDevices, getDataDevice, getAllDevicesNoFilter, postDataDevice } from '../controllers/deviceController.js'
 
 const router = express.Router()
 
@@ -197,6 +197,8 @@ const router = express.Router()
  */
 
 router.post('/all-devices-workspaces', getAllDevicesNoFilter);
+
+router.post('/:id', postDataDevice);
 
 router.get('/:id', getDataDevice);
 

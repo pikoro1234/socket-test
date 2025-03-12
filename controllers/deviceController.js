@@ -16,6 +16,11 @@ export const getAllDevices = async (req, res) => {
     }
 }
 
+export const postDataDevice = async (req, res)=> {
+    console.log(req.body);
+    res.status(200).json({message:req.body})
+}
+
 export const getDataDevice = async (req, res) => {
     try {
         const deviceId = req.params.id

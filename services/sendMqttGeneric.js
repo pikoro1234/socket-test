@@ -1,4 +1,7 @@
 import mqtt from 'async-mqtt';
+import { config } from 'dotenv';
+import path from 'path';
+config({ path: process.env.CONFIG_PATH || path.resolve(process.cwd(), '.env'), });
 
 export async function sendMqttMessage(topic, msg) {
     try {
