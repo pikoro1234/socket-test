@@ -64,7 +64,6 @@ export async function sendMqttPrompt(prompt) {
                 }
                 console.log("Mensaje enviado a broker:", prompt);
             });
-            // });
         });
 
         // Escuchar respuesta del modelo

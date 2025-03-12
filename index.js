@@ -59,22 +59,24 @@ app.use('/devices', verifyTokken, deviceRoutes);
 app.use('/data-device', verifyTokken, deviceDataRoutes);
 
 // data influx IA
-app.post('/data-ia/processing', async (req, res) => {
-    const { prompt } = req.body;
-    try {
+app.use('/data-ia', verifyTokken, deviceDataRoutes);
 
-        if (prompt === '') return res.status(400).json({ status: "error", message: "text required" })
+// app.post('/data-ia/processing', async (req, res) => {
+//     const { prompt } = req.body;
+//     try {
 
-        const response = await sendMqttPrompt(prompt);
+//         if (prompt === '') return res.status(400).json({ status: "error", message: "text required" })
 
-        return res.json(response);
+//         const response = await sendMqttPrompt(prompt);
 
-    } catch (error) {
+//         return res.json(response);
 
-        console.log("entramos al catch");
-        return res.status(500).json({ status: "error", message: error });
-    }
-})
+//     } catch (error) {
+
+//         console.log("entramos al catch");
+//         return res.status(500).json({ status: "error", message: error });
+//     }
+// })
 
 // validacion y control del login MYQL/MONGO,etc
 app.post('/login', (req, res) => {

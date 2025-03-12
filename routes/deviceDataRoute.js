@@ -5,6 +5,6 @@ const router = express.Router()
 
 router.post('/', getAllDataInflux)
 
-router.post('/', getResponseIa)
+router.post('/processing-data', getResponseIa)
 
 export default router
