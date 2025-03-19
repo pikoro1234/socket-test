@@ -1,4 +1,5 @@
 import { fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
+import { configUpdateSolana } from '../services/putDataDevices.js';
 
 export const getAllDevices = async (req, res) => {
     try {
@@ -16,9 +17,31 @@ export const getAllDevices = async (req, res) => {
     }
 }
 
-export const postDataDevice = async (req, res)=> {
-    console.log(req.body);
-    res.status(200).json({message:req.body})
+export const postDataDevice = async (req, res) => {
+    try {
+
+        if (!req.header('Authorization')) { return res.status(403).json({ error: 'Token requerido' }) };
+
+        if (req.body.type === 'solana') {
+
+            const response = await configUpdateSolana(req.body)
+
+            if (response.status === 200) {
+
+                console.log({ message: 'update correct' });
+
+                return res.status(200).json({ message: 'update correct' })
+            }
+
+            console.log({ message: 'update error' });
+
+            return res.status(500).json({ message: 'update error' })
+        }
+
+    } catch (error) {
+
+        res.status(500).json({ message: 'Error al actualizar el dispositivo.', error: error.message });
+    }
 }
 
 export const getDataDevice = async (req, res) => {

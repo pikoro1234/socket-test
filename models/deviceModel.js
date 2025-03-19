@@ -52,3 +52,27 @@ export const fetchDataDevice = async (deviceId) => {
         throw error;
     }
 }
+
+export const updateDataDevice = async (deviceBody, deviceId) => {
+    // console.log(deviceBody);
+    try {
+        const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.X_API_KEY
+            },
+            body: JSON.stringify(deviceBody),
+        })
+
+        if (!response.ok) { throw new Error(`${response.statusText}`); }
+
+        console.log(await response.json());
+
+        return response;
+
+    } catch (error) {
+        console.error('Error en obtener datos del dispositivo:', error.message);
+        throw error;
+    }
+}
