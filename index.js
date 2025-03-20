@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -24,7 +25,32 @@ const app = express();
 app.use(express.json());
 
 // Permitir CORS para todas las rutas
-app.use(cors());
+// app.use(cors());
+
+// Permitir el uso e intercambio de cookies
+app.use(cookieParser());
+
+const corsPublico = cors({
+    origin: "*", // ✅ Permite acceso desde cualquier origen
+    methods: [ "GET", "POST", "OPTIONS" ], // ✅ Métodos permitidos
+});
+
+
+const corsProtegido = cors({
+    origin: [ "http://localhost:3004", "http://34.175.190.28", "https://www.urbidermis.com", "https://urbicomm.io" ], // ✅ SOLO orígenes permitidos
+    credentials: true, // ✅ Permite envío de cookies
+    methods: [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ], // ✅ Métodos HTTP permitidos
+    allowedHeaders: [ "Content-Type", "Authorization" ], // ✅ Encabezados permitidos
+});
+
+
+// 🔹 **Aplica CORS solo en rutas públicas**
+// app.use(cors({
+//     origin: "*", // 🔥 Permite acceso a rutas públicas sin cookies
+//     methods: [ "GET", "POST", "OPTIONS" ],
+// }));
+
+
 
 // Eliminamos el aviso de que frame utilizamos
 app.disable('x-powered-by');
@@ -50,19 +76,19 @@ app.get('/', async (req, res) => {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // workspaces -> akenza
-app.use('/workspaces', verifyTokken, workspaceRoutes);
+app.use('/workspaces', corsProtegido, workspaceRoutes);
 
 // devices -> akenza
-app.use('/devices', verifyTokken, deviceRoutes);
+app.use('/devices', corsProtegido, deviceRoutes);
 
 // obtenemos los datos de influxDB /single-device-data
-app.use('/data-device', verifyTokken, deviceDataRoutes);
+app.use('/data-device', corsProtegido, deviceDataRoutes);
 
 // data influx IA
-app.use('/data-ia', verifyTokken, deviceDataRoutes);
+app.use('/data-ia', corsProtegido, deviceDataRoutes);
 
 // insercion de ficheros descargables para web urbidermis
-app.use('/urbidermis-download', urbidermisRouter);
+app.use('/urbidermis-download', corsProtegido, urbidermisRouter);
 
 // example para lucas
 app.get('/data-server', (req, res) => {
@@ -83,32 +109,32 @@ app.get('/data-server', (req, res) => {
                 {
                     name: "Girona",
                     devices: [
-                        { name: "solana 1", id: "JAT1001A" },
-                        { name: "solana 2", id: "JAT1002A" }
+                        { name: "solana 1", id: "JAT1001A", uuiID: "02f8c787a749767a" },
+                        { name: "solana 2", id: "JAT1002A", uuiID: "02a88271804a3bd4" }
 
                     ]
                 },
                 {
                     name: "Port Ginesta",
                     devices: [
-                        { name: "solana 3", id: "JAT1003A" },
-                        { name: "solana 4", id: "JAT1004A" }
+                        { name: "solana 3", id: "JAT1003A", uuiID: "02c4819a475fe4ca" },
+                        { name: "solana 4", id: "JAT1004A", uuiID: "02ffd0d907664d07" }
 
                     ]
                 },
                 {
                     name: "Marina Palamos",
                     devices: [
-                        { name: "solana 5", id: "JAT1005A" },
-                        { name: "solana 6", id: "JAT1006A" }
+                        { name: "solana 5", id: "JAT1005A", uuiID: "02d5029c2216f2bf" },
+                        { name: "solana 6", id: "JAT1006A", uuiID: "0254bc752b6acdf6" }
 
                     ]
                 }, {
                     name: "Roca Valles",
                     devices: [
-                        { name: "solana 7", id: "JAT1007A" },
-                        { name: "solana 8", id: "JAT1008A" },
-                        { name: "solana 9", id: "JAT1009A" }
+                        { name: "solana 7", id: "JAT1007A", uuiID: "02c9d061ff686311" },
+                        { name: "solana 8", id: "JAT1008A", uuiID: "028443cf9667e55e" },
+                        { name: "solana 9", id: "JAT1009A", uuiID: "0234ccc76a2782bb" }
 
                     ]
                 }
@@ -148,17 +174,17 @@ app.get('/data-server', (req, res) => {
     }
 })
 
-app.use('/login', userRouter)
+app.use('/login', corsProtegido, userRouter)
 
-app.post('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
     try {
-        if (!req.body.username) {
-            res.status(404).json({ message: 'User/Password Not Found' });
-        }
+        // if (!req.body.username) {
+        //     res.status(404).json({ message: 'User/Password Not Found' });
+        // }
 
-        if (!req.body.userpassword) {
-            res.status(404).json({ message: 'User/Password Not Found' });
-        }
+        // if (!req.body.userpassword) {
+        //     res.status(404).json({ message: 'User/Password Not Found' });
+        // }
 
         res.status(200).json({ message: 'login correct' })
     } catch (error) {
@@ -166,6 +192,8 @@ app.post('/logout', (req, res) => {
         console.log(error);
     }
 })
+
+// app.options("*", cors());
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {

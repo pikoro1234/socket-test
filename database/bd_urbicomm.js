@@ -14,6 +14,17 @@ export const pool_urbicomm = mysql.createPool({
     queueLimit: 0
 });
 
+export const pool_urbidata = mysql.createPool({
+    host: process.env.HOST_DB_URBICOMM,
+    user: process.env.USER_DB_URBICOMM,
+    password: process.env.PASSWORD_DB_URBICOMM,
+    database: process.env.DATABASE_DB_URBIDATA,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+
 // CREATE TABLE `downloads` (
 //     `id` int(11) NOT NULL AUTO_INCREMENT,
 //     `user_entorno` varchar(20) NOT NULL,

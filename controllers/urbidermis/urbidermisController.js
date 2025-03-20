@@ -11,7 +11,6 @@ export const validateFiles = async (req, res) => {
 
         if (user_email_file !== 'No definido') {
             const response = await insertFilesModel(req.body);
-            console.log(response.affectedRows);
             if (response.affectedRows >= 1) {
                 return res.status(200).json({ message: "insercion correcta" })
             }
