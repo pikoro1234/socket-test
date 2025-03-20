@@ -7,8 +7,8 @@ import { verifyTokken } from './services/generateTokken.js';
 import workspaceRoutes from './routes/workspaceRoute.js';
 import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
-
-import { pool } from './database/bd_urbi.js';
+import userRouter from './routes/users/userRoute.js';
+import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -61,52 +61,10 @@ app.use('/data-device', verifyTokken, deviceDataRoutes);
 // data influx IA
 app.use('/data-ia', verifyTokken, deviceDataRoutes);
 
-app.post('/urbidermis-download', async (req, res) => {
-    try {
-        const { user_entorno, name_file, url_file, fecha_file, user_email_file, user_nick_file, user_ip_file, user_idioma } = req.body;
+// insercion de ficheros descargables para web urbidermis
+app.use('/urbidermis-download', urbidermisRouter);
 
-        // Validación simple de datos
-        if (!user_entorno || !name_file || !user_email_file || !user_nick_file || !user_ip_file || !user_idioma) {
-            return res.status(400).json({ message: "❌ Faltan campos obligatorios" });
-        }
-
-        if (url_file !== '') {
-            // Insertar datos en la base de datos
-            const sql = `
-                INSERT INTO downloads (user_entorno, name_file, url_file, fecha_file, user_email_file, user_nick_file, user_ip_file, user_idioma)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `;
-            const values = [ user_entorno, name_file, url_file, fecha_file, user_email_file, user_nick_file, user_ip_file, user_idioma ];
-
-            const [ result ] = await pool.query(sql, values);
-            res.json({ message: "📂 Datos insertados correctamente", id: result.insertId });
-        }
-
-    } catch (error) {
-        console.error("❌ Error al insertar datos:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
-})
-
-
-// app.post('/data-ia/processing', async (req, res) => {
-//     const { prompt } = req.body;
-//     try {
-
-//         if (prompt === '') return res.status(400).json({ status: "error", message: "text required" })
-
-//         const response = await sendMqttPrompt(prompt);
-
-//         return res.json(response);
-
-//     } catch (error) {
-
-//         console.log("entramos al catch");
-//         return res.status(500).json({ status: "error", message: error });
-//     }
-// })
-
-// validacion y control del login MYQL/MONGO,etc
+// example para lucas
 app.get('/data-server', (req, res) => {
     try {
         // if (!req.body.username) {
@@ -189,6 +147,8 @@ app.get('/data-server', (req, res) => {
         console.log(error);
     }
 })
+
+app.use('/login', userRouter)
 
 app.post('/logout', (req, res) => {
     try {

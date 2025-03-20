@@ -1,10 +1,14 @@
 import mysql from "mysql2/promise";
+import { config } from 'dotenv';
+import path from 'path';
 
-export const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "pht549Afin",
-    database: "urbidermis_data",
+config({ path: process.env.CONFIG_PATH || path.resolve(process.cwd(), '.env'), });
+
+export const pool_urbicomm = mysql.createPool({
+    host: process.env.HOST_DB_URBICOMM,
+    user: process.env.USER_DB_URBICOMM,
+    password: process.env.PASSWORD_DB_URBICOMM,
+    database: process.env.DATABASE_DB_URBICOMM,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
