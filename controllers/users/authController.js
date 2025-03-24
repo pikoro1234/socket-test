@@ -54,14 +54,10 @@ export const refreshToken = async (req, res) => {
 
         const refreshToken = req.cookies.refresh_token;
 
-        console.log(req.body);
-
         if (!refreshToken) {
 
             return res.status(401).json({ message: "Refresh token no proporcionado" });
         }
-
-        const response = await loginUserModel(req.body);
 
         // verificamos que el token es valido
         jwt.verify(refreshToken, process.env.SECRET_TOKKEN, (err, user) => {
@@ -71,43 +67,19 @@ export const refreshToken = async (req, res) => {
                 return res.status(403).json({ message: "Refresh token inválido o expirado" });
             }
 
-            if (response) {
+            // generamos nuevo token_access si refresh_token es correcto
+            const newAccessToken = jwt.sign({ id: user.id, username: user.username }, process.env.SECRET_TOKKEN, { expiresIn: "15m" });
 
-                const user = { id: response.uuid, username };
+            res.cookie("access_token", newAccessToken, {
+                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 15 * 60 * 1000, path: "/",
+            });
 
-                // generamos nuevo token_access si refresh_token es correcto
-                const newAccessToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "15m" })
+            res.json({ message: "Access token renovado correctamente", success: true });
 
-                res.cookie("access_token", newAccessToken, {
-                    httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 15 * 60 * 1000, path: "/"
-                });
-
-                res.json({ message: "Access token renovado correctamente", success: true });
-
-            }else {
-
-                res.json({ message: "No se pudo renovar el token", success: false });
-            }
         })
     } catch (error) {
 
+        console.error("Error al refrescar token", error);
+        res.status(500).json({ message: "Error del servidor" });
     }
 }
-
-
-// app.post("/refresh", (req, res) => {
-//     const refreshToken = req.cookies.refresh_token;
-//     if (!refreshToken) return res.status(401).json({ message: "Token no encontrado" });
-
-//     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
-//         if (err) return res.status(403).json({ message: "Token inválido" });
-
-//         const newAccessToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "15m" });
-
-//         res.cookie("access_token", newAccessToken, {
-//             httpOnly: true, secure: true, sameSite: "None", maxAge: 15 * 60 * 1000, path: "/"
-//         });
-
-//         res.json({ message: "Token renovado" });
-//     });
-// });
