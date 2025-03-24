@@ -7,6 +7,6 @@ router.post("/login/", loginUser);
 
 // router.post("/logout", logoutUser);
 
-router.post("/refresh", refreshToken);
+router.post("/refresh/", refreshToken);
 
 export default router

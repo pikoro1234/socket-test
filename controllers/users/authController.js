@@ -50,6 +50,8 @@ export const loginUser = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
 
+    console.log(req);
+
     try {
 
         const refreshToken = req.cookies.refresh_token;

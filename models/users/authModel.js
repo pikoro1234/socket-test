@@ -2,10 +2,13 @@ import { pool_urbidata } from '../../database/bd_urbicomm.js';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
-export const updatePassword = (textPassword) => {
+export const updatePassword = async (textPassword) => {
     // insertamos en base de datos el nuevos pass y si todo esta correcto retornamos el pass
     try {
         const sha256Hash = crypto.createHash('sha256').update(textPassword).digest('hex');
+        const bcryptHash = await bcrypt.hash(textPassword, 10);
+        return bcryptHash;
+        // return sha256Hash;
     } catch (error) {
         console.log(error);
     }
@@ -20,7 +23,7 @@ export const loginUserModel = async (objBody) => {
             return null;
         }
 
-        return user[0];
+        return user[ 0 ];
 
     } catch (error) {
 
