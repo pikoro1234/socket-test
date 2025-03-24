@@ -4,12 +4,13 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
+import authMiddleware from './middleware/authMiddleware.js';
+import authRouter from './routes/users/authRouter.js'
+import userRouter from './routes/users/userRouter.js';
 import workspaceRoutes from './routes/workspaceRoute.js';
 import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
-import userRouter from './routes/users/userRoute.js';
-import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
-import authMiddleware from './middleware/authMiddleware.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -180,20 +181,17 @@ app.get('/logout', (req, res) => {
     }
 })
 
-// REORGANIZAMOS RUTAS CON TOKKEN Y PUBLICAS
-app.use('/login', userRouter)
+//********* REORGANIZAMOS RUTAS CON TOKKEN Y PUBLICAS
+// authRouter: solo maneja login, logout, refresh.
+// userRouter: información del usuario, actualizar datos, etc.
+// projectRouter: CRUD de proyectos.
+// deviceRouter: CRUD de dispositivos.
 
-import { pool_urbidata } from './database/bd_urbicomm.js';
+// auth router
+app.use('/auth', authRouter); // Login, Logout, Refresh
 
-app.post('/test', authMiddleware, async (req, res) => {
-
-    var userId = req.user.id;
-    console.log(userId);
-    userId = 3
-    const [ projects ] = await pool_urbidata.query("SELECT * FROM `client_devices` WHERE client_id = ?", [ userId ]);
-    console.log(projects);
-    res.status(200).json({ message: 'testeando datos con cookie' })
-})
+// data user
+app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
