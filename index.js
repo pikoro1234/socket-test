@@ -4,12 +4,12 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { verifyTokken } from './services/generateTokken.js';
 import workspaceRoutes from './routes/workspaceRoute.js';
 import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
 import userRouter from './routes/users/userRoute.js';
 import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
+import authMiddleware from './middleware/authMiddleware.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -24,33 +24,22 @@ const app = express();
 // Middleware para analizar JSON en el cuerpo de las solicitudes
 app.use(express.json());
 
-// Permitir CORS para todas las rutas
-// app.use(cors());
-
 // Permitir el uso e intercambio de cookies
 app.use(cookieParser());
 
-const corsPublico = cors({
-    origin: "*", // ✅ Permite acceso desde cualquier origen
-    methods: [ "GET", "POST", "OPTIONS" ], // ✅ Métodos permitidos
-});
+// Generamos objeto cors que permite el envio y uso de cookies entre el servidor y el cliente
+const corsOptions = {
+    origin: [ "http://localhost:3004", "http://34.175.190.28", "https://www.urbidermis.com", "https://urbicomm.io" ],
+    methods: [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+    allowedHeaders: [ "Content-Type", "Authorization" ],
+    credentials: true,
+};
 
+// Aplicar CORS de forma global ANTES de las rutas
+app.use(cors(corsOptions));
 
-const corsProtegido = cors({
-    origin: [ "http://localhost:3004", "http://34.175.190.28", "https://www.urbidermis.com", "https://urbicomm.io" ], // ✅ SOLO orígenes permitidos
-    credentials: true, // ✅ Permite envío de cookies
-    methods: [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ], // ✅ Métodos HTTP permitidos
-    allowedHeaders: [ "Content-Type", "Authorization" ], // ✅ Encabezados permitidos
-});
-
-
-// 🔹 **Aplica CORS solo en rutas públicas**
-// app.use(cors({
-//     origin: "*", // 🔥 Permite acceso a rutas públicas sin cookies
-//     methods: [ "GET", "POST", "OPTIONS" ],
-// }));
-
-
+// Middleware para manejar preflight requests (Opcional)
+app.options("*", cors(corsOptions));
 
 // Eliminamos el aviso de que frame utilizamos
 app.disable('x-powered-by');
@@ -76,19 +65,19 @@ app.get('/', async (req, res) => {
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // workspaces -> akenza
-app.use('/workspaces', corsProtegido, workspaceRoutes);
+app.use('/workspaces', workspaceRoutes);
 
 // devices -> akenza
-app.use('/devices', corsProtegido, deviceRoutes);
+app.use('/devices', deviceRoutes);
 
 // obtenemos los datos de influxDB /single-device-data
-app.use('/data-device', corsProtegido, deviceDataRoutes);
+app.use('/data-device', deviceDataRoutes);
 
 // data influx IA
-app.use('/data-ia', corsProtegido, deviceDataRoutes);
+app.use('/data-ia', deviceDataRoutes);
 
 // insercion de ficheros descargables para web urbidermis
-app.use('/urbidermis-download', corsProtegido, urbidermisRouter);
+app.use('/urbidermis-download', urbidermisRouter);
 
 // example para lucas
 app.get('/data-server', (req, res) => {
@@ -174,8 +163,6 @@ app.get('/data-server', (req, res) => {
     }
 })
 
-app.use('/login', corsProtegido, userRouter)
-
 app.get('/logout', (req, res) => {
     try {
         // if (!req.body.username) {
@@ -193,7 +180,20 @@ app.get('/logout', (req, res) => {
     }
 })
 
-// app.options("*", cors());
+// REORGANIZAMOS RUTAS CON TOKKEN Y PUBLICAS
+app.use('/login', userRouter)
+
+import { pool_urbidata } from './database/bd_urbicomm.js';
+
+app.post('/test', authMiddleware, async (req, res) => {
+
+    var userId = req.user.id;
+    console.log(userId);
+    userId = 3
+    const [ projects ] = await pool_urbidata.query("SELECT * FROM `client_devices` WHERE client_id = ?", [ userId ]);
+    console.log(projects);
+    res.status(200).json({ message: 'testeando datos con cookie' })
+})
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {

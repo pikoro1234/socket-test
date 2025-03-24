@@ -1,51 +1,67 @@
+import jwt from 'jsonwebtoken';
 import { loginUserModel } from '../../models/users/userModel.js';
-import { generateTokkenApi } from '../../services/generateTokken.js';
+import { getEntorno } from '../../services/helper.js';
 
 export const loginUser = async (req, res) => {
-    console.log(req.body);
 
     try {
-        if (!req.body.username || req.body.username === '') {
-            return res.status(400).json({ message: 'User/Password Required' });
-        }
-
-        if (!req.body.userpassword || req.body.userpassword === '') {
-            return res.status(400).json({ message: 'User/Password Required' });
-        }
 
         const { username, userpassword } = req.body;
 
-        const isLocalhost = req.headers.origin?.includes("localhost");
-        const isProduction = !isLocalhost; // Si no es localhost, es producción
+        if (!username || username === '') {
+            return res.status(400).json({ message: 'User/Password Required' });
+        }
 
-        const accessToken = generateTokkenApi();
-        const refreshToken = generateTokkenApi();
+        if (!userpassword || userpassword === '') {
+            return res.status(400).json({ message: 'User/Password Required' });
+        }
 
-        console.log(accessToken);
-        console.log(refreshToken);
+        const response = await loginUserModel(req.body);
 
-        res.cookie("access_token", accessToken, {
-            httpOnly: true,
-            secure: isProduction, // ✅ En producción debe ser true
-            sameSite: "None", // 🔥 Necesario para sitios cruzados
-            path: "/",
-            domain: isProduction ? "urbicomm.io" : undefined, // ✅ Solo en producción
-            maxAge: 15 * 60 * 1000, // 15 minutos
-        });
+        if (response) {
 
-        res.cookie("refresh_token", refreshToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: "None",
-            path: "/",
-            domain: isProduction ? "urbicomm.io" : undefined,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-        });
+            const user = { id: response.uuid, username };
 
-        return res.status(200).json({ message: "Login correcto", success: true });
+            const accessToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "15m" });
+
+            const refreshToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "7d" });
+
+            res.cookie("access_token", accessToken, {
+                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 15 * 60 * 1000, path: "/"
+            });
+
+            res.cookie("refresh_token", refreshToken, {
+                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
+            });
+
+            res.json({ message: "Login correcto", success: true });
+
+        } else {
+
+            res.json({ message: "Login incorrecto", success: false });
+        }
 
     } catch (error) {
+
         console.error(error);
         return res.status(500).json({ message: "Error usuario no válido" });
     }
 };
+
+
+// app.post("/refresh", (req, res) => {
+//     const refreshToken = req.cookies.refresh_token;
+//     if (!refreshToken) return res.status(401).json({ message: "Token no encontrado" });
+
+//     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
+//         if (err) return res.status(403).json({ message: "Token inválido" });
+
+//         const newAccessToken = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+//         res.cookie("access_token", newAccessToken, {
+//             httpOnly: true, secure: true, sameSite: "None", maxAge: 15 * 60 * 1000, path: "/"
+//         });
+
+//         res.json({ message: "Token renovado" });
+//     });
+// });
