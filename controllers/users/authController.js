@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { loginUserModel } from '../../models/users/authModel.js';
-import { getEntorno } from '../../services/helper.js';
+import { getEntorno } from '../../services/custom.js';
 
 export const loginUser = async (req, res) => {
 

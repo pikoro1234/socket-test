@@ -191,7 +191,9 @@ app.get('/logout', (req, res) => {
 app.use('/auth', authRouter); // Login, Logout, Refresh
 
 // data user
+// app.use('/user', userRouter); // Profile, Data, etc
 app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
+
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
