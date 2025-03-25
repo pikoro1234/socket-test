@@ -22,7 +22,7 @@ export const loginUser = async (req, res) => {
 
             const user = { id: response.uuid, username };
 
-            const accessToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "15m" });
+            const accessToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "50m" });
 
             const refreshToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "7d" });
 

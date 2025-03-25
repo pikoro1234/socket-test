@@ -8,6 +8,7 @@ import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
 import authMiddleware from './middleware/authMiddleware.js';
 import authRouter from './routes/users/authRouter.js'
 import userRouter from './routes/users/userRouter.js';
+import projectRouter from './routes/projects/projectRouter.js';
 import workspaceRoutes from './routes/workspaceRoute.js';
 import deviceRoutes from './routes/deviceRoute.js';
 import deviceDataRoutes from './routes/deviceDataRoute.js';
@@ -191,8 +192,10 @@ app.get('/logout', (req, res) => {
 app.use('/auth', authRouter); // Login, Logout, Refresh
 
 // data user
-// app.use('/user', userRouter); // Profile, Data, etc
 app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
+
+// crud projects
+app.use('/projects', projectRouter) // Project || sub-projects --- create/update/delete
 
 
 // Iniciar el servidor
