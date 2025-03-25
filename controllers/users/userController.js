@@ -6,7 +6,7 @@ export const getUserData = async (req, res) => {
         const userId = req.user.id;
 
         if (!userId) {
-            res.status(401).json({ message: "User no autorizado." });
+            return res.status(401).json({ message: "User no autorizado." });
         }
 
         const response = await getUserDataModel(userId);
