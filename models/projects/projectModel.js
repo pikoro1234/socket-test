@@ -18,3 +18,35 @@ export const createProjectDataModel = async (bodyRequest) => {
         return 0
     }
 }
+
+export const getProjectDataModel = async (id) => {
+
+    try {
+
+        const queryDataProject = `SELECT * FROM clients WHERE id = ?`;
+
+        const [ dataProject ] = await pool_urbidata.query(queryDataProject, [ id ]);
+
+        const querySubCompanies = `SELECT * FROM clients 
+            JOIN client_subcompanies ON clients.id = client_subcompanies.parent_client_id 
+            WHERE clients.id = ?`;
+
+        const [ subCompanies ] = await pool_urbidata.query(querySubCompanies, [ id ]);
+
+        const queryUsers = `SELECT * FROM user_clients 
+            JOIN users ON user_clients.user_id = users.uuid 
+            JOIN user_roles ON users.uuid = user_roles.user_id 
+            JOIN roles ON user_roles.role_id = roles.id WHERE client_id = ?`;
+
+        const [ users ] = await pool_urbidata.query(queryUsers, [ id ]);
+
+        return {
+            dataProject: dataProject[ 0 ],
+            subCompanies: subCompanies,
+            users: users
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}

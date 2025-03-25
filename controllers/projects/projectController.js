@@ -1,4 +1,4 @@
-import { createProjectDataModel } from "../../models/projects/projectModel.js";
+import { createProjectDataModel, getProjectDataModel } from "../../models/projects/projectModel.js";
 
 export const createProjectData = async (req, res) => {
 
@@ -22,6 +22,25 @@ export const createProjectData = async (req, res) => {
 
     } catch (error) {
 
+        console.log(error);
+    }
+}
+
+export const getProjectData = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).json({ success: false, message: "ID inválido" });
+        }
+
+        const response = await getProjectDataModel(id);
+
+        return res.status(200).json({ message: response })
+
+    } catch (error) {
         console.log(error);
     }
 }
