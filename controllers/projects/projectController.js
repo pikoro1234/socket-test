@@ -32,11 +32,17 @@ export const getProjectData = async (req, res) => {
 
         const { id } = req.params;
 
+        const userId = req.user.id
+
         if (!id || isNaN(Number(id))) {
             return res.status(400).json({ success: false, message: "ID inválido" });
         }
 
-        const response = await getProjectDataModel(id);
+        if (!userId) {
+            return res.status(403).json({ success: false, message: "Token inválido" });
+        }
+
+        const response = await getProjectDataModel(id,userId);
 
         return res.status(200).json({ message: response })
 

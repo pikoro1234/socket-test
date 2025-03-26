@@ -195,7 +195,7 @@ app.use('/auth', authRouter); // Login, Logout, Refresh
 app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 
 // crud projects
-app.use('/projects', projectRouter) // Project || sub-projects --- create/update/delete
+app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
 
 
 // Iniciar el servidor
