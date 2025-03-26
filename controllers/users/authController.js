@@ -34,7 +34,7 @@ export const loginUser = async (req, res) => {
                 httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
 
-            res.json({ message: "Login correcto", success: true });
+            return res.json({ message: "Login correcto", success: true });
 
         } else {
 
@@ -47,6 +47,27 @@ export const loginUser = async (req, res) => {
         return res.status(500).json({ message: "Error usuario no válido" });
     }
 };
+
+export const logoutUser = async (req, res) => {
+
+    try {
+
+        res.clearCookie("access_token", {
+            httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+        });
+
+        res.clearCookie("refresh_token", {
+            httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+        });
+
+        return res.json({ message: "Logout exitoso", success: true });
+
+    } catch (error) {
+
+        console.error("Error en logout:", error);
+        return res.status(500).json({ message: "Error al cerrar sesión" });
+    }
+}
 
 export const refreshToken = async (req, res) => {
 
