@@ -28,13 +28,11 @@ export const getUserProjects = async (req, res) => {
 
     try {
 
-        const userId = req.user.id;
-
-        if (!userId) {
+        if (!req.user.id) {
             return res.status(401).json({ message: "User no autorizado." });
         }
 
-        const response = await getUserProjectsModel(userId);
+        const response = await getUserProjectsModel(req.user);
 
         if (response.length === 0) {
 

@@ -34,6 +34,8 @@ export const getProjectData = async (req, res) => {
 
         const userId = req.user.id
 
+        const rolUser = req.user.role_id
+
         if (!id || isNaN(Number(id))) {
             return res.status(400).json({ success: false, message: "ID inválido" });
         }
@@ -42,7 +44,7 @@ export const getProjectData = async (req, res) => {
             return res.status(403).json({ success: false, message: "Token inválido" });
         }
 
-        const response = await getProjectDataModel(id,userId);
+        const response = await getProjectDataModel(id, rolUser);
 
         return res.status(200).json({ message: response })
 

@@ -1,5 +1,4 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
-import { getRolUser } from '../../helpers/helperUsers.js';
 
 export const getUserDataModel = async (userId) => {
 
@@ -19,11 +18,11 @@ export const getUserDataModel = async (userId) => {
     }
 }
 
-export const getUserProjectsModel = async (userId) => {
+export const getUserProjectsModel = async (reqUser) => {
 
     try {
 
-        const { role_id } = await getRolUser(userId);
+        const { id, username, role_id } = reqUser;
 
         let query = "";
         let params = [];
@@ -35,7 +34,7 @@ export const getUserProjectsModel = async (userId) => {
         } else {
 
             query = "SELECT * FROM `user_clients` JOIN clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?"
-            params = [ userId ]
+            params = [ id ]
         }
 
         const [ dataProjects ] = await pool_urbidata.query(query, params);

@@ -17,7 +17,11 @@ export const updatePassword = async (textPassword) => {
 export const loginUserModel = async (objBody) => {
     try {
 
-        const [ user ] = await pool_urbidata.query('SELECT * FROM users WHERE email = ?', [ objBody.username ]);
+        const query = `SELECT users.uuid AS uuid, users.email AS email, roles.id AS rol_id, users.password AS password FROM users 
+            JOIN user_roles ON users.uuid = user_roles.user_id 
+            JOIN roles on user_roles.role_id = roles.id WHERE email = ?`;
+
+        const [ user ] = await pool_urbidata.query(query, [ objBody.username ]);
 
         if (user.length === 0 || !await (bcrypt.compare(objBody.userpassword, user[ 0 ].password))) {
             return null;
