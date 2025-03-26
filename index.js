@@ -4,14 +4,17 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import workspaceRoutes from './routes/workspaceRoute.js';
+import deviceRoutes from './routes/deviceRoute.js';
+import deviceDataRoutes from './routes/deviceDataRoute.js';
+
+// import regeneradas 
 import urbidermisRouter from './routes/urbidermis/urbidermisRoute.js';
 import authMiddleware from './middleware/authMiddleware.js';
 import authRouter from './routes/users/authRouter.js'
 import userRouter from './routes/users/userRouter.js';
 import projectRouter from './routes/projects/projectRouter.js';
-import workspaceRoutes from './routes/workspaceRoute.js';
-import deviceRoutes from './routes/deviceRoute.js';
-import deviceDataRoutes from './routes/deviceDataRoute.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -196,6 +199,8 @@ app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 
 // crud projects
 app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
+
+app.use('/devices', deviceRouter)
 
 
 // Iniciar el servidor

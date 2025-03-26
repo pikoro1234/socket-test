@@ -1,5 +1,4 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
-import { getRolUser } from '../../helpers/helperUsers.js';
 
 export const createProjectDataModel = async (bodyRequest) => {
 

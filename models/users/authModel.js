@@ -3,12 +3,12 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
 export const updatePassword = async (textPassword) => {
+
     // insertamos en base de datos el nuevos pass y si todo esta correcto retornamos el pass
     try {
         const sha256Hash = crypto.createHash('sha256').update(textPassword).digest('hex');
         const bcryptHash = await bcrypt.hash(textPassword, 10);
-        return bcryptHash;
-        // return sha256Hash;
+        return bcryptHash
     } catch (error) {
         console.log(error);
     }

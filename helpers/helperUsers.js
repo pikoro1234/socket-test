@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import { pool_urbidata } from "../database/bd_urbicomm.js"
 export const getRolUser = async (userId) => {
 
