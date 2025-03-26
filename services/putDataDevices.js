@@ -1,4 +1,4 @@
-import { fetchDataDevice, updateDataDevice } from "../models/deviceModel.js";
+import { fetchDataDevice, updateDataDevice } from '../models/deviceModel.js';
 
 export const configUpdateSolana = async (bodyConfig) => {
     const description = bodyConfig.generic_description === '' ? 'description no defined' : bodyConfig.generic_description;

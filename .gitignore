@@ -6,3 +6,4 @@ env-example
 .env.vars
 /uploads
 songs-file.json
+no-trackin.js

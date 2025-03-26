@@ -15,6 +15,7 @@ import authMiddleware from './middleware/authMiddleware.js';
 import authRouter from './routes/users/authRouter.js'
 import userRouter from './routes/users/userRouter.js';
 import projectRouter from './routes/projects/projectRouter.js';
+import deviceRouter from './routes/devices/deviceRouter.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -200,7 +201,7 @@ app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 // crud projects
 app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
 
-app.use('/devices', deviceRouter)
+app.use('/devices', deviceRouter); // Devices --- Get - Post - Put
 
 
 // Iniciar el servidor

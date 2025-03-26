@@ -1,4 +1,4 @@
-import { pool_urbicomm } from "../../database/bd_urbicomm.js";
+import { pool_urbicomm } from '../../database/bd_urbicomm.js';
 
 export const insertFilesModel = async (values) => {
     try {
