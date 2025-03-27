@@ -53,11 +53,11 @@ export const logoutUser = async (req, res) => {
     try {
 
         res.clearCookie("access_token", {
-            httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+            httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
         });
 
         res.clearCookie("refresh_token", {
-            httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+            httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
         });
 
         return res.json({ message: "Logout exitoso", success: true });
