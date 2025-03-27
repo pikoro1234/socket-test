@@ -74,7 +74,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/workspaces', workspaceRoutes);
 
 // devices -> akenza
-app.use('/devices', deviceRoutes);
+// app.use('/devices', deviceRoutes);
 
 // obtenemos los datos de influxDB /single-device-data
 app.use('/data-device', deviceDataRoutes);
@@ -201,6 +201,7 @@ app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 // crud projects
 app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
 
+// crud devices
 app.use('/devices', deviceRouter); // Devices --- Get - Post - Put
 
 

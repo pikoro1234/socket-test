@@ -1,5 +1,8 @@
-import { getNoFilterWorkSpace } from '../../helpers/helperDevices.js';
-import { getDevicesModel } from '../../models/devices/deviceModel.js';
+import { getNoFilterWorkSpace, filterCustomField } from '../../helpers/helperDevices.js';
+import { getDevicesModel, importDevicesModel } from '../../models/devices/deviceModel.js';
+import { customFetch } from '../../services/custom.js';
+import { uri_primary } from '../../no-trackin.js';
+
 
 export const getDevices = async (req, res) => {
 
@@ -7,49 +10,53 @@ export const getDevices = async (req, res) => {
 
         const workspaces = await getNoFilterWorkSpace();
 
-        const devices = await getDevicesModel(workspaces)
+        const devices = await getDevicesModel(workspaces);
 
-        res.json(devices)
+        if (devices.data.content.length > 0) {
+
+            const mappedDevices = devices.data.content.map(({ id, deviceId, name, description, customFields }) => {
+
+                const coordenadas = filterCustomField(customFields, 'Coordenadas').GPS_COORDINATES;
+
+                return {
+                    id_device: deviceId,
+                    id_reference: id,
+                    type: name,
+                    description: description,
+                    coordenadas: coordenadas,
+                };
+            });
+
+            return res.status(200).json(mappedDevices);
+        }
+
+        return res.status(404).json({ message: "Not found." });
 
     } catch (error) {
         console.log(error);
     }
 }
 
-// export const fetchDevices = async (workspaceIds) => {
-//     try {
-//         const response = await fetch('https://api.akenza.io/v3/assets/list?size=50', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'x-api-key': process.env.X_API_KEY
-//             },
-//             body: JSON.stringify({
-//                 organizationId: process.env.ID_ORGANIZACION,
-//                 workspaceIds: workspaceIds
-//             }),
-//         })
+export const importDevices = async (req, res) => {
 
-//         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
+    try {
 
-//         return await response.json();
+        const method = 'GET'
+        const uri = `${uri_primary}/devices`
+        const headers = { "Content-Type": "application/json", }
+        const response = await customFetch(method, uri, headers, {})
 
-//     } catch (error) {
-//         console.error('Error en fetchDevices:', error.message);
-//         throw error;
-//     }
-// }
+        const insertDevicesDb = await importDevicesModel(response.data)
 
+        if (insertDevicesDb.inserted > 0) {
+            return res.json({ message: "Inserción completa" })
+        }
 
-// export const getterAllDevices = async () => {
-//     try {
-//         const method = 'POST'
-//         const endPoint = '/devices/all-devices-workspaces/'
-//         const body = JSON.stringify({ workspaceIds: [ "29a71256cb3e82ed", "295f038c09806307", "292a1e5b1f960b80" ] })
-//         const response = await fetchDevices(endPoint, body, method);
-//         // console.log(response.devices.content);
-//         return response.devices.content
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
+        return res.json({ message: "Error en la inseción" })
+
+    } catch (error) {
+
+        console.log(error);
+        return res.json({ message: "Error en la inseción" })
+    }
+}
