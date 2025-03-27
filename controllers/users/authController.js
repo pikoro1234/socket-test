@@ -27,11 +27,11 @@ export const loginUser = async (req, res) => {
             const refreshToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "7d" });
 
             res.cookie("access_token", accessToken, {
-                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 50 * 60 * 1000, path: "/"
+                httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 50 * 60 * 1000, path: "/"
             });
 
             res.cookie("refresh_token", refreshToken, {
-                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
+                httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
 
             return res.json({ message: "Login correcto", success: true });
