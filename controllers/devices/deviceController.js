@@ -42,7 +42,7 @@ export const importDevices = async (req, res) => {
     try {
 
         const method = 'GET'
-        const uri = `${uri_primary}/devices`
+        const uri = `${uri_primary}/devices/getter-devices/`
         const headers = { "Content-Type": "application/json", }
         const response = await customFetch(method, uri, headers, {})
 
@@ -52,11 +52,11 @@ export const importDevices = async (req, res) => {
             return res.json({ message: "Inserción completa" })
         }
 
-        return res.json({ message: "Error en la inseción" })
+        return res.json({ message: "Error en la inseción se borraron todos los datos" })
 
     } catch (error) {
 
         console.log(error);
-        return res.json({ message: "Error en la inseción" })
+        return res.json({ message: "Error en la inseción se borraron todos los datos" })
     }
 }

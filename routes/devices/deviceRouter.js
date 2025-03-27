@@ -3,7 +3,7 @@ import { getDevices, importDevices } from '../../controllers/devices/deviceContr
 
 const router = express.Router()
 
-router.get('/', getDevices)
+router.get('/getter-devices/', getDevices)
 
 router.post('/import-devices/', importDevices)
 
