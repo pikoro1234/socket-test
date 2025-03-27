@@ -49,14 +49,14 @@ export const importDevices = async (req, res) => {
         const insertDevicesDb = await importDevicesModel(response.data)
 
         if (insertDevicesDb.inserted > 0) {
-            return res.json({ message: "Inserción completa" })
+            return res.status(200).json({ message: "Inserción completa" })
         }
 
-        return res.json({ message: "Error en la inseción se borraron todos los datos" })
+        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos" })
 
     } catch (error) {
 
         console.log(error);
-        return res.json({ message: "Error en la inseción se borraron todos los datos" })
+        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos" })
     }
 }
