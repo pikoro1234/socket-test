@@ -1,5 +1,6 @@
 import { pool_urbidata } from '../database/bd_urbicomm.js';
-export const getRolUser = async (userId) => {
+
+export const helperGetRolUser = async (userId) => {
 
     try {
 
@@ -10,6 +11,24 @@ export const getRolUser = async (userId) => {
         }
 
         return dataRol[ 0 ];
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+export const helperGetClientUser = async (userId) => {
+
+    try {
+
+        const [ dataClient ] = await pool_urbidata.query("SELECT * FROM `user_clients` WHERE user_id = ?", [ userId ]);
+
+        if (dataClient.length === 0) {
+            return null;
+        }
+
+        return dataClient[ 0 ];
 
     } catch (error) {
 

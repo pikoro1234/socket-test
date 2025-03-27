@@ -187,10 +187,6 @@ app.get('/logout', (req, res) => {
 })
 
 //********* REORGANIZAMOS RUTAS CON TOKKEN Y PUBLICAS
-// authRouter: solo maneja login, logout, refresh.
-// userRouter: información del usuario, actualizar datos, etc.
-// projectRouter: CRUD de proyectos.
-// deviceRouter: CRUD de dispositivos.
 
 // auth router
 app.use('/auth', authRouter); // Login, Logout, Refresh
@@ -202,8 +198,7 @@ app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
 
 // crud devices
-app.use('/devices', deviceRouter); // Devices --- Get - Post - Put
-
+app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - Put
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {

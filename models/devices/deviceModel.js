@@ -1,6 +1,44 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
-import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
+import { helperGetClientUser } from '../../helpers/helperUsers.js';
 import { customFetch } from '../../services/custom.js';
+import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
+
+export const getDevicesModel = async (idUser, idRol) => {
+
+    try {
+
+        let query_devices = ``;
+        let params = [];
+
+        if (idRol === 1) {
+
+            query_devices = "SELECT * FROM devices";
+
+        } else if (idRol === 2) {
+
+            const { user_id, client_id } = await helperGetClientUser(idUser); // query my client
+
+            if (client_id) {
+
+                query_devices = `SELECT * FROM client_devices JOIN devices ON client_devices.device_id = devices.id_device WHERE client_devices.client_id = ?`;
+                params = [ client_id ]
+            }
+
+        } else {
+
+            query_devices = "SELECT * FROM devices";
+
+        }
+
+        const [ result ] = await pool_urbidata.query(query_devices, params);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
 
 export const getDevicesNoFilterModel = async (workspaces) => {
 
