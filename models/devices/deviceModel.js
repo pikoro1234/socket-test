@@ -19,44 +19,62 @@ export const getDevicesModel = async (workspaces) => {
 
 export const importDevicesModel = async (data) => {
 
-    const response = {
-        inserted: 0,
-        errors: []
-    }
+    let response = 0;
 
     try {
-
-        const [ queryDelete ] = await pool_urbidata.query(`DELETE FROM devices`);
 
         for (const device of data) {
 
             try {
 
-                const queryInsert = `INSERT INTO devices (id_device, id_reference, type, description, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)`;
+                const id_device = device.id_device;
+                const id_reference = device.id_reference;
+                const type = device.type;
+                const description = device.description;
+                const latitude = device.coordenadas ? device.coordenadas.latitude : '';
+                const longitude = device.coordenadas ? device.coordenadas.longitude : '';
+                const date_created = device.date_created;
 
-                const values = [
-                    device.id_device,
-                    device.id_reference,
-                    device.type,
-                    device.description,
-                    device.coordenadas ? device.coordenadas.latitude : '',
-                    device.coordenadas ? device.coordenadas.longitude : '',
-                ];
+                const [ resultExistDevice ] = await pool_urbidata.query(`SELECT * FROM devices WHERE id_device = ?`, [ id_device ])
 
-                const [ result ] = await pool_urbidata.query(queryInsert, values);
+                if (resultExistDevice[ 0 ]) {
 
-                if (result.affectedRows > 0) {
+                    const queryUpdate = 'UPDATE devices SET type=?, description=?, latitude=?, longitude=? WHERE id_device = ?';
 
-                    response.inserted += 1;
+                    const valuesUpdate = [
+                        type,
+                        description,
+                        latitude,
+                        longitude,
+                        id_device
+                    ];
+
+                    const [ resultUpdate ] = await pool_urbidata.query(queryUpdate, valuesUpdate);
 
                 } else {
 
-                    response.errors.push({ device, message: "No se insertó" });
+                    const queryInsert = `INSERT INTO devices (id_device, id_reference, type, description, latitude, longitude,date_created) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+                    const valuesInsert = [
+                        id_device,
+                        id_reference,
+                        type,
+                        description,
+                        latitude,
+                        longitude,
+                        date_created
+                    ];
+
+                    const [ resultInsert ] = await pool_urbidata.query(queryInsert, valuesInsert);
                 }
+
+                response = 1
 
             } catch (insertErr) {
 
-                response.errors.push({ device, message: insertErr.message });
+                response = 0
+
+                console.log(insertErr);
             }
         }
 
@@ -65,9 +83,6 @@ export const importDevicesModel = async (data) => {
     } catch (error) {
 
         console.error("Error general:", error);
-        return {
-            inserted: 0,
-            errors: [ { message: error.message } ],
-        };
+        return 0;
     }
 };

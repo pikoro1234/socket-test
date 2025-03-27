@@ -14,7 +14,7 @@ export const getDevices = async (req, res) => {
 
         if (devices.data.content.length > 0) {
 
-            const mappedDevices = devices.data.content.map(({ id, deviceId, name, description, customFields }) => {
+            const mappedDevices = devices.data.content.map(({ id, deviceId, name, description, customFields, created }) => {
 
                 const coordenadas = filterCustomField(customFields, 'Coordenadas').GPS_COORDINATES;
 
@@ -24,6 +24,7 @@ export const getDevices = async (req, res) => {
                     type: name,
                     description: description,
                     coordenadas: coordenadas,
+                    date_created: created
                 };
             });
 
@@ -48,7 +49,7 @@ export const importDevices = async (req, res) => {
 
         const insertDevicesDb = await importDevicesModel(response.data)
 
-        if (insertDevicesDb.inserted > 0) {
+        if (insertDevicesDb > 0) {
             return res.status(200).json({ message: "Inserción completa" })
         }
 
@@ -57,6 +58,6 @@ export const importDevices = async (req, res) => {
     } catch (error) {
 
         console.log(error);
-        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos" })
+        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos try/catch" })
     }
 }
