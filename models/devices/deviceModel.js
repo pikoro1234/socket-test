@@ -2,7 +2,7 @@ import { pool_urbidata } from '../../database/bd_urbicomm.js';
 import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 
-export const getDevicesModel = async (workspaces) => {
+export const getDevicesNoFilterModel = async (workspaces) => {
 
     try {
 

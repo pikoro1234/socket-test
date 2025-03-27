@@ -1,9 +1,9 @@
 import express from 'express'
-import { getDevices, importDevices } from '../../controllers/devices/deviceController.js'
+import { getDevicesNoFilter, importDevices } from '../../controllers/devices/deviceController.js'
 
 const router = express.Router()
 
-router.get('/getter-devices/', getDevices)
+router.get('/getter-devices/', getDevicesNoFilter)
 
 router.post('/import-devices/', importDevices)
 

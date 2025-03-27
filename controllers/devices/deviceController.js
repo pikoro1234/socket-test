@@ -1,16 +1,16 @@
 import { getNoFilterWorkSpace, filterCustomField } from '../../helpers/helperDevices.js';
-import { getDevicesModel, importDevicesModel } from '../../models/devices/deviceModel.js';
+import { getDevicesNoFilterModel, importDevicesModel } from '../../models/devices/deviceModel.js';
 import { customFetch } from '../../services/custom.js';
 import { uri_primary } from '../../no-trackin.js';
 
 
-export const getDevices = async (req, res) => {
+export const getDevicesNoFilter = async (req, res) => {
 
     try {
 
         const workspaces = await getNoFilterWorkSpace();
 
-        const devices = await getDevicesModel(workspaces);
+        const devices = await getDevicesNoFilterModel(workspaces);
 
         if (devices.data.content.length > 0) {
 
