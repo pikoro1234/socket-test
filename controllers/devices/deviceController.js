@@ -1,5 +1,5 @@
 import { getNoFilterWorkSpace, filterCustomField } from '../../helpers/helperDevices.js';
-import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel } from '../../models/devices/deviceModel.js';
+import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel } from '../../models/devices/deviceModel.js';
 import { customFetch } from '../../services/custom.js';
 import { uri_primary } from '../../no-trackin.js';
 
@@ -81,7 +81,7 @@ export const importDevices = async (req, res) => {
     }
 }
 
-export const getMyDetailsDevice = async (req,res)=> {
+export const getMyDetailsDevice = async (req, res) => {
 
     try {
 
@@ -91,9 +91,9 @@ export const getMyDetailsDevice = async (req,res)=> {
         //     return res.status(403).json({ success: false, message: "Token inválido" });
         // }
 
-        // const response = await getDevicesModel(id, role_id);
+        const response = await getMyDetailsDeviceModel("J0003A");
 
-        const response =  "mis devices"
+        // const response =  "mis devices"
 
         return res.status(200).json({ message: response })
 

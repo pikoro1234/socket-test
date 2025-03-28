@@ -1,7 +1,7 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
 import { helperGetClientUser } from '../../helpers/helperUsers.js';
 import { customFetch } from '../../services/custom.js';
-import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
+import { uri_root_dashboard, header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
 
 export const getDevicesModel = async (idUser, idRol) => {
 
@@ -125,16 +125,42 @@ export const importDevicesModel = async (data) => {
     }
 };
 
-export const getMyDetailsDeviceModel = async (id_device)=> {
+export const getMyDetailsDeviceModel = async (id_device) => {
 
     try {
-        
+
         const method = 'GET'
-        
-        const response = await customFetch()
+        const uri = `${uri_root_dashboard}/devices/by-device-id?deviceId=${id_device}`
+        const result = await customFetch(method, uri, header_api_key_extern, {})
+
+        if (result.success) {
+            console.log(result.data)
+            // const mappedDetails = devices.data.content.map(({ id, deviceId, name, description, customFields, created }) => {
+
+            //     const coordenadas = filterCustomField(customFields, 'Coordenadas').GPS_COORDINATES;
+
+            //     return {
+            //         id_device: deviceId,
+            //         id_reference: id,
+            //         type: name,
+            //         description: description,
+            //         coordenadas: coordenadas,
+            //         date_created: created
+            //     };
+            // });
+
+            // console.log(mappedDetails);
+
+            // return res.status(200).json(mappedDevices);
+        }
+
+        return result
+
+        // console.log(result);
 
     } catch (error) {
-        
+
+        console.log(error);
     }
 
 
@@ -142,15 +168,17 @@ export const getMyDetailsDeviceModel = async (id_device)=> {
 
 }
 
-var request = require('request');
-var options = {
-  'method': 'GET',
-  'url': 'https://api.akenza.io/v3/devices/by-device-id?deviceId=J0003A',
-  'headers': {
-    'x-api-key': '3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270'
-  }
-};
-request(options, function (error, response) {
-  if (error) throw new Error(error);
-  console.log(response.body);
-});
+// var request = require('request');
+// var options = {
+//     'method': 'GET',
+//     'url': 'https://api.akenza.io/v3/devices/by-device-id?deviceId=J0003A',
+//     'headers': {
+//         'x-api-key': '3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270'
+//     }
+// };
+
+// // https://api.akenza.io/v3/devices/${deviceId}
+// request(options, function (error, response) {
+//     if (error) throw new Error(error);
+//     console.log(response.body);
+// });
