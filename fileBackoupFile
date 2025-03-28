@@ -9,8 +9,8 @@ const SSL_CERT_PATH = '/home/adminweb/cert.pem';
 
 // Configuración de los certificados SSL
 const sslOptions = {
-  key: fs.readFileSync(SSL_KEY_PATH),
-  cert: fs.readFileSync(SSL_CERT_PATH),
+    key: fs.readFileSync(SSL_KEY_PATH),
+    cert: fs.readFileSync(SSL_CERT_PATH),
 };
 
 // Inicializar la aplicación Express
@@ -21,7 +21,7 @@ app.use(express.json());
 
 // Definir una ruta REST
 app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hola desde la API REST en el servidor combinado' });
+    res.json({ message: 'Hola desde la API REST en el servidor combinado' });
 });
 
 // Crear el servidor HTTPS
@@ -32,27 +32,27 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 
 // Manejar conexiones WebSocket
 wss.on('connection', (ws) => {
-  console.log('Cliente conectado al WebSocket.');
+    console.log('Cliente conectado al WebSocket.');
 
-  // Enviar un mensaje de bienvenida al cliente
-  ws.send('¡Bienvenido al WebSocket del servidor combinado!');
+    // Enviar un mensaje de bienvenida al cliente
+    ws.send('¡Bienvenido al WebSocket del servidor combinado!');
 
-  // Manejar mensajes recibidos del cliente
-  ws.on('message', (message) => {
-    console.log('Mensaje recibido:', message);
-    ws.send(`Mensaje recibido: ${message}`);
-  });
+    // Manejar mensajes recibidos del cliente
+    ws.on('message', (message) => {
+        console.log('Mensaje recibido:', message);
+        ws.send(`Mensaje recibido: ${message}`);
+    });
 
-  // Manejar la desconexión del cliente
-  ws.on('close', () => {
-    console.log('Cliente desconectado del WebSocket.');
-  });
+    // Manejar la desconexión del cliente
+    ws.on('close', () => {
+        console.log('Cliente desconectado del WebSocket.');
+    });
 });
 
 // Iniciar el servidor HTTPS en el puerto 3002
 const PORT = 3002;
 server.listen(PORT, () => {
-  console.log(`Servidor combinado escuchando en https://localhost:${PORT}`);
+    console.log(`Servidor combinado escuchando en https://localhost:${PORT}`);
 });
 
 ////////////////////////////////////////OTROO////////////////////////////////////////////////
@@ -277,7 +277,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
         const { command, file } = req.body;
         const body = {
             "command": `${command}`,
-            "file": `${process.env.URL_SERVER}/uploads/${file.name}`
+            "file": `https://urbicomm.io/uploads/${file.name}`
         };
 
         await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
@@ -319,7 +319,7 @@ app.post('/lights', verifyTokken, async (req, res) => {
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
         // Configuración para la conexión MQTT
-        const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+        const mqttBrokerUrl = "qtt.akenza.io"
         const username = process.env.MQTT_USERNAME;
         const password = process.env.MQTT_PASSWORD;
         const deviceId = process.env.MQTT_DEVICE_ID;
@@ -664,7 +664,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
         const { command, file } = req.body;
         const body = {
             "command": `${command}`,
-            "file": `${process.env.URL_SERVER}/uploads/${file.name}`
+            "file": `https://urbicomm.io/uploads/${file.name}`
         };
 
         await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
@@ -706,7 +706,7 @@ app.post('/lights', verifyTokken, async (req, res) => {
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
         // Configuración para la conexión MQTT
-        const mqttBrokerUrl = process.env.MQTT_BROKER_URL;
+        const mqttBrokerUrl = "qtt.akenza.io"
         const username = process.env.MQTT_USERNAME;
         const password = process.env.MQTT_PASSWORD;
         const deviceId = process.env.MQTT_DEVICE_ID;

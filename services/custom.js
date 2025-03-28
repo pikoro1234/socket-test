@@ -1,6 +1,7 @@
 export const getEntorno = () => {
     return process.env.NODE_ENV === "production";
 }
+
 export const customFetch = async (method, uri, headers, body) => {
 
     try {

@@ -1,7 +1,7 @@
-import express from 'express'
-import { getAllDevices, getDataDevice, getAllDevicesNoFilter, postDataDevice } from '../controllers/deviceController.js'
+// import express from 'express'
+// import { getAllDevices, getDataDevice, getAllDevicesNoFilter, postDataDevice } from '../controllers/deviceController.js'
 
-const router = express.Router()
+// const router = express.Router()
 
 /**
  * @swagger
@@ -196,12 +196,12 @@ const router = express.Router()
  *                   example: "No autorizado. Token de autorización requerido."
  */
 
-router.post('/all-devices-workspaces', getAllDevicesNoFilter);
+// router.post('/all-devices-workspaces', getAllDevicesNoFilter);
 
-router.post('/:id', postDataDevice);
+// router.post('/:id', postDataDevice);
 
-router.get('/:id', getDataDevice);
+// router.get('/:id', getDataDevice);
 
-router.post('/', getAllDevices);
+// router.post('/', getAllDevices);
 
-export default router
+// export default router

@@ -1,10 +1,10 @@
-import express from 'express'
-import { getAllDataInflux, getResponseIa } from '../controllers/deviceDataController.js';
+// import express from 'express'
+// import { getAllDataInflux, getResponseIa } from '../controllers/deviceDataController.js';
 
-const router = express.Router()
+// const router = express.Router()
 
-router.post('/', getAllDataInflux)
+// router.post('/', getAllDataInflux)
 
-router.post('/processing-data', getResponseIa)
+// router.post('/processing-data', getResponseIa)
 
-export default router
+// export default router

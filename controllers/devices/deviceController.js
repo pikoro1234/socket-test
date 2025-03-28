@@ -80,3 +80,25 @@ export const importDevices = async (req, res) => {
         return res.status(503).json({ message: "Error en la inseción se borraron todos los datos try/catch" })
     }
 }
+
+export const getMyDetailsDevice = async (req,res)=> {
+
+    try {
+
+        // const { id, role_id } = req.user
+
+        // if (!id) {
+        //     return res.status(403).json({ success: false, message: "Token inválido" });
+        // }
+
+        // const response = await getDevicesModel(id, role_id);
+
+        const response =  "mis devices"
+
+        return res.status(200).json({ message: response })
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
