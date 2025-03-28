@@ -10,7 +10,7 @@
 // mostrar todos los workspaces --> Desde la API de akenza
 // export const fetchWorkspaces = async () => {
 //     try {
-//         const response = await fetch(`https://api.akenza.io/v3/workspaces?organizationId=2814c3d718dd1526`, {
+//         const response = await fetch(`apidash/workspaces?organizationId=2814c3d718dd1526`, {
 //             method: 'GET',
 //             headers: {
 //                 'Content-Type': 'application/json',

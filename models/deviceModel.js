@@ -10,7 +10,7 @@
 // mostrar todos los dispositivos --> Desde la API de akenza
 // export const fetchDevices = async (workspaceIds) => {
 //     try {
-//         const response = await fetch('https://api.akenza.io/v3/assets/list?size=50', {
+//         const response = await fetch('apidash/v3/assets/list?size=50', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -35,7 +35,7 @@
 // mostrar datos de un solo dispositivo --> Desde la API de akenza
 // export const fetchDataDevice = async (deviceId) => {
 //     try {
-//         const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`, {
+//         const response = await fetch(`apidash/devices/${deviceId}`, {
 //             method: 'GET',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -56,7 +56,7 @@
 // export const updateDataDevice = async (deviceBody, deviceId) => {
 //     // console.log(deviceBody);
 //     try {
-//         const response = await fetch(`https://api.akenza.io/v3/devices/${deviceId}`, {
+//         const response = await fetch(`apidash/devices/${deviceId}`, {
 //             method: 'PUT',
 //             headers: {
 //                 'Content-Type': 'application/json',
