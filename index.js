@@ -74,7 +74,7 @@ app.use('/user', authMiddleware, userRouter); // Profile, Data, etc
 app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects --- create/update/delete
 
 // crud devices
-app.use('/devices', deviceRouter); // Devices --- Get - Post - Put
+app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - Put
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
