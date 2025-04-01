@@ -90,11 +90,13 @@ export const getMyDetailsDevice = async (req, res) => {
         const id = req.apiAccess ? req.position_user : req.user.id;
         // const role_id = req.apiAccess ? req.position_rol.role_id : req.user.role_id;
 
+        console.log(req.params);
+
         if (!id) {
             return res.status(403).json({ success: false, message: "Token inválido" });
         }
 
-        const response = await getMyDetailsDeviceModel("02318d4b0f355eda");
+        const response = await getMyDetailsDeviceModel(req.params.id);
 
         if (!response.success) {
 
