@@ -1,7 +1,7 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
 import { helperGetClientUser } from '../../helpers/helperUsers.js';
 import { customFetch } from '../../services/custom.js';
-import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
+import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern, uri_root_dashboard } from '../../no-trackin.js';
 
 export const getDevicesModel = async (idUser, idRol) => {
 
@@ -135,27 +135,19 @@ export const getMyDetailsDeviceModel = async (id_device) => {
     try {
 
         const method = 'GET'
-        
-        const response = await customFetch()
+        const uri = `${uri_root_dashboard}/devices/${id_device}`
+        uri_root_dashboard
+        const result = await customFetch(method, uri, header_api_key_extern, {})
+
+        if (!result.success) {
+
+            return json({ message: "Not Found..." })
+        }
+
+        return result
 
     } catch (error) {
-        
+
+        console.log(error);
     }
-
-
-    // customFetch = async (method, uri, headers, body
-
 }
-
-var request = require('request');
-var options = {
-  'method': 'GET',
-  'url': 'https://api.akenza.io/v3/devices/by-device-id?deviceId=J0003A',
-  'headers': {
-    'x-api-key': '3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270'
-  }
-};
-request(options, function (error, response) {
-  if (error) throw new Error(error);
-  console.log(response.body);
-});

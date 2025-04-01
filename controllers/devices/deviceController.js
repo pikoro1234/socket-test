@@ -1,5 +1,4 @@
-import { getNoFilterWorkSpace, filterCustomField } from '../../helpers/helperDevices.js';
-import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel } from '../../models/devices/deviceModel.js';
+import { uri_primary } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
 import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel } from '../../models/devices/deviceModel.js';
@@ -95,9 +94,14 @@ export const getMyDetailsDevice = async (req, res) => {
             return res.status(403).json({ success: false, message: "Token inválido" });
         }
 
-        // const response = await getDevicesModel(id, role_id);
+        const response = await getMyDetailsDeviceModel("02318d4b0f355eda");
 
-        const response =  "mis devices"
+        if (!response.success) {
+
+            return res.status(404).json({ message: "Not Found..." })
+        }
+
+        const transformData = mappedStructDevice(response.data.name, response.data);
 
         return res.status(200).json({ message: transformData })
 

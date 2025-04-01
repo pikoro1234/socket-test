@@ -1,4 +1,4 @@
-import { fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
+// import { fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
 // import { configUpdateSolana } from '../services/putDataDevices.js';
 
 // export const getAllDevices = async (req, res) => {
@@ -44,21 +44,20 @@ import { fetchDevices, fetchDataDevice } from '../models/deviceModel.js';
 //     }
 // }
 
-// borrar al desplegar
-export const getDataDevice = async (req, res) => {
-    try {
-        const deviceId = req.params.id
+// export const getDataDevice = async (req, res) => {
+//     try {
+//         const deviceId = req.params.id
 
-        if (!deviceId) { return res.status(400).json({ message: 'deviceId es requerido' }) }
+//         if (!deviceId) { return res.status(400).json({ message: 'deviceId es requerido' }) }
 
-        const dataDevice = await fetchDataDevice(deviceId);
+//         const dataDevice = await fetchDataDevice(deviceId);
 
-        res.status(200).json({ message: 'Detalles del dispositivo completo.', dataDevice })
+//         res.status(200).json({ message: 'Detalles del dispositivo completo.', dataDevice })
 
-    } catch (error) {
-        res.status(500).json({ message: 'Error al obtener datos del dispositivos.', error: error.message });
-    }
-}
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error al obtener datos del dispositivos.', error: error.message });
+//     }
+// }
 
 // export const getAllDevicesNoFilter = async (req, res) => {
 //     try {
