@@ -4,7 +4,7 @@ export const getUserData = async (req, res) => {
 
     try {
 
-        const userId = req.user.id;
+        const userId = req.apiAccess ? req.position_user : req.user.id;
 
         if (!userId) {
             return res.status(401).json({ message: "User no autorizado." });
@@ -28,11 +28,13 @@ export const getUserProjects = async (req, res) => {
 
     try {
 
-        if (!req.user.id) {
+        const userId = req.apiAccess !== undefined ? req.position_user : req.user.id;
+
+        if (!userId) {
             return res.status(401).json({ message: "User no autorizado." });
         }
 
-        const response = await getUserProjectsModel(req.user);
+        const response = await getUserProjectsModel(req);
 
         if (response.length === 0) {
 

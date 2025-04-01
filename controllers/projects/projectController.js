@@ -32,9 +32,9 @@ export const getProjectData = async (req, res) => {
 
         const { id } = req.params;
 
-        const userId = req.user.id
+        const userId = req.apiAccess ? req.position_user : req.user.id
 
-        const rolUser = req.user.role_id
+        const rolUser = req.apiAccess ? req.position_rol.role_id : req.user.role_id
 
         if (!id || isNaN(Number(id))) {
             return res.status(400).json({ success: false, message: "ID inválido" });

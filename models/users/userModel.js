@@ -18,11 +18,12 @@ export const getUserDataModel = async (userId) => {
     }
 }
 
-export const getUserProjectsModel = async (reqUser) => {
+export const getUserProjectsModel = async (reqOptions) => {
 
     try {
 
-        const { id, username, role_id } = reqUser;
+        const id = reqOptions.apiAccess !== undefined ? reqOptions.position_user : reqOptions.user.id
+        const role_id = reqOptions.apiAccess !== undefined ? reqOptions.position_rol.role_id : reqOptions.user.role_id
 
         let query = "";
         let params = [];

@@ -7,7 +7,8 @@ export const getDevices = async (req, res) => {
 
     try {
 
-        const { id, role_id } = req.user
+        const id = req.apiAccess ? req.position_user : req.user.id;
+        const role_id = req.apiAccess ? req.position_rol.role_id : req.user.role_id;
 
         if (!id) {
             return res.status(403).json({ success: false, message: "Token inválido" });
@@ -81,7 +82,7 @@ export const importDevices = async (req, res) => {
     }
 }
 
-export const getMyDetailsDevice = async (req,res)=> {
+export const getMyDetailsDevice = async (req, res) => {
 
     try {
 
@@ -93,7 +94,7 @@ export const getMyDetailsDevice = async (req,res)=> {
 
         // const response = await getDevicesModel(id, role_id);
 
-        const response =  "mis devices"
+        const response = "mis devices"
 
         return res.status(200).json({ message: response })
 

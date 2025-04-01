@@ -6,12 +6,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // import regeneradas 
-import urbidermisRouter from './routes/urbidermis/urbidermisRouter.js';
 import authMiddleware from './middleware/authMiddleware.js';
+import urbidermisRouter from './routes/urbidermis/urbidermisRouter.js';
 import authRouter from './routes/users/authRouter.js'
 import userRouter from './routes/users/userRouter.js';
 import projectRouter from './routes/projects/projectRouter.js';
 import deviceRouter from './routes/devices/deviceRouter.js';
+import apiKeyRouter from './routes/apiKey/apiKeyRouter.js';
+import iaRouter from './routes/iA/iaRouter.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -75,6 +77,102 @@ app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects -
 
 // crud devices
 app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - Put
+
+// data procesing for IA V.1
+app.use('/data-ia', authMiddleware, iaRouter)
+
+// ADMIN GENERATE ,UPDATE DELETE TOKKEN STATIC
+app.use('/protected/', apiKeyRouter);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const preguntasSimilares = [
+//     "Cuantos dispositivos tengo?",
+//     "Cuantos dispositivos tengo?",
+//     "que cantidad de proyectos tengo?",
+//     // "¿Dónde está ubicado el dispositivo?",
+//     // "¿Cuál es la ubicación del sensor?",
+//     // "Dame la localización del dispositivo",
+//     // "¿Dónde se encuentra instalado el equipo?",
+//     // "Muéstrame el lugar del dispositivo",
+//     // "Ubicación actual del dispositivo",
+//     // "¿Dónde está el sensor ahora?",
+//     // "Posición del dispositivo",
+//     // "¿En qué ciudad está el dispositivo?",
+//     // "¿Dónde fue instalado el sensor?"
+//   ];
+
+
+
+
+
+//   import stringSimilarity from "string-similarity";
+
+// // const promptUsuario = "Dime dónde se encuentra el dispositivo";
+// const promptUsuario = "dime cuantos devices tengo";
+
+// const { bestMatch } = stringSimilarity.findBestMatch(promptUsuario, preguntasSimilares);
+
+// console.log("Pregunta más parecida:", bestMatch.target);
+// console.log("Similitud:", bestMatch.rating);
+
+// // Validación
+// if (bestMatch.rating > 0.6) {
+//   console.log("✅ Pregunta válida");
+// } else {
+//   console.log("❌ Pregunta no reconocida");
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
