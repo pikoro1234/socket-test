@@ -1,6 +1,6 @@
 {
   "name": "node",
-  "version": "1.0.0",
+  "version": "v1.0.0-beta",
   "main": "index.js",
   "type": "module",
   "scripts": {
