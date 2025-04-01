@@ -82,7 +82,7 @@ app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - P
 app.use('/data-ia', authMiddleware, iaRouter)
 
 // ADMIN GENERATE ,UPDATE DELETE TOKKEN STATIC
-app.use('/protected/', apiKeyRouter);
+app.use('/protected', apiKeyRouter);
 
 
 

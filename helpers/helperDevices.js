@@ -19,3 +19,64 @@ export const getNoFilterWorkSpace = async () => {
         console.log(error);
     }
 }
+
+export const mappedStructDevice = (typeDevice, response) => {
+
+    let responseMap = {}
+
+    if (typeDevice === 'Solana') {
+
+        responseMap = {
+            device_id_reference: response.id,
+            device_id: response.deviceId,
+            device_name_type: response.name,
+            device_description: response.description,
+            device_workspace_dashboard: response.workspaceId,
+            device_created: response.created,
+            device_updated: response.updated,
+            device_online: response.online,
+            device_workspace_data: filterCustomField(response.customFields, 'workspace').STRING,
+            device_zona: filterCustomField(response.customFields, 'Timezone').STRING,
+            device_coordenadas: filterCustomField(response.customFields, 'Coordenadas').GPS_COORDINATES,
+            device_params: filterCustomField(response.customFields, 'Params').JSON,
+            device_config: filterCustomField(response.customFields, 'Config').JSON
+        }
+    }
+
+    if (typeDevice === 'Franklin') {
+
+        responseMap = {
+            device_id_reference: response.id,
+            device_id: response.deviceId,
+            device_name_type: response.name,
+            device_description: response.description,
+            device_workspace_dashboard: response.workspaceId,
+            device_created: response.created,
+            device_updated: response.updated,
+            device_online: response.online,
+            device_workspace_data: filterCustomField(response.customFields, 'workspace').STRING,
+            device_zona: filterCustomField(response.customFields, 'Timezone').STRING,
+            device_coordenadas: filterCustomField(response.customFields, 'Coordenadas').GPS_COORDINATES,
+        }
+    }
+
+    if (typeDevice === 'Basic') {
+
+        responseMap = {
+            device_id_reference: response.id,
+            device_id: response.deviceId,
+            device_name_type: response.name,
+            device_description: response.description,
+            device_workspace_dashboard: response.workspaceId,
+            device_created: response.created,
+            device_updated: response.updated,
+            device_online: response.online,
+            device_workspace_data: filterCustomField(response.customFields, 'workspace').STRING,
+            device_zona: filterCustomField(response.customFields, 'Timezone').STRING,
+            device_coordenadas: filterCustomField(response.customFields, 'Coordenadas').GPS_COORDINATES,
+            device_config: filterCustomField(response.customFields, 'Config').JSON
+        }
+    }
+
+    return responseMap
+}

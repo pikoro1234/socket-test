@@ -1,7 +1,7 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
 import { helperGetClientUser } from '../../helpers/helperUsers.js';
 import { customFetch } from '../../services/custom.js';
-import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern } from '../../no-trackin.js';
+import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern, uri_root_dashboard } from '../../no-trackin.js';
 
 export const getDevicesModel = async (idUser, idRol) => {
 
@@ -130,55 +130,19 @@ export const getMyDetailsDeviceModel = async (id_device) => {
     try {
 
         const method = 'GET'
-        const uri = `${uri_root_dashboard}/devices/by-device-id?deviceId=${id_device}`
+        const uri = `${uri_root_dashboard}/devices/${id_device}`
+        uri_root_dashboard
         const result = await customFetch(method, uri, header_api_key_extern, {})
 
-        if (result.success) {
-            console.log(result.data)
-            // const mappedDetails = devices.data.content.map(({ id, deviceId, name, description, customFields, created }) => {
+        if (!result.success) {
 
-            //     const coordenadas = filterCustomField(customFields, 'Coordenadas').GPS_COORDINATES;
-
-            //     return {
-            //         id_device: deviceId,
-            //         id_reference: id,
-            //         type: name,
-            //         description: description,
-            //         coordenadas: coordenadas,
-            //         date_created: created
-            //     };
-            // });
-
-            // console.log(mappedDetails);
-
-            // return res.status(200).json(mappedDevices);
+            return json({ message: "Not Found..." })
         }
 
         return result
-
-        // console.log(result);
 
     } catch (error) {
 
         console.log(error);
     }
-
-
-    // customFetch = async (method, uri, headers, body
-
 }
-
-// var request = require('request');
-// var options = {
-//     'method': 'GET',
-//     'url': 'https://api.akenza.io/v3/devices/by-device-id?deviceId=J0003A',
-//     'headers': {
-//         'x-api-key': '3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270'
-//     }
-// };
-
-// // https://api.akenza.io/v3/devices/${deviceId}
-// request(options, function (error, response) {
-//     if (error) throw new Error(error);
-//     console.log(response.body);
-// });
