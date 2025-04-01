@@ -52,7 +52,6 @@ wss.on('connection', (ws) => {
 // Iniciar el servidor HTTPS en el puerto 3002
 const PORT = 3002;
 server.listen(PORT, () => {
-    console.log(`Servidor combinado escuchando en https://localhost:${PORT}`);
 });
 
 ////////////////////////////////////////OTROO////////////////////////////////////////////////
@@ -440,7 +439,6 @@ app.get('/read-socket', async (req, res) => {
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
 
 ////////////////////////////////////////OTROO////////////////////////////////////////////////
@@ -769,5 +767,5 @@ app.use('/devices', deviceRoutes)
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+
 });
