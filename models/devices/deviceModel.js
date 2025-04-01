@@ -26,8 +26,13 @@ export const getDevicesModel = async (idUser, idRol) => {
 
         } else {
 
-            query_devices = "SELECT * FROM devices";
+            const { user_id, client_id } = await helperGetClientUser(idUser); // query my client
 
+            if (client_id) {
+
+                query_devices = `SELECT * FROM client_devices JOIN devices ON client_devices.device_id = devices.id_device WHERE client_devices.client_id = ?`;
+                params = [ client_id ]
+            }
         }
 
         const [ result ] = await pool_urbidata.query(query_devices, params);

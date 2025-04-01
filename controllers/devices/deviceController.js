@@ -110,5 +110,3 @@ export const getMyDetailsDevice = async (req, res) => {
         console.log(error);
     }
 }
-
-// export const 

@@ -79,7 +79,7 @@ app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects -
 app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - Put
 
 // data procesing for IA V.1
-app.use('/data-ia', authMiddleware, iaRouter)
+app.use('/data-ia', authMiddleware, iaRouter)  // query automatice sql - fluxed queries
 
 // ADMIN GENERATE ,UPDATE DELETE TOKKEN STATIC
 app.use('/protected', apiKeyRouter);
