@@ -176,5 +176,5 @@ app.use('/protected', apiKeyRouter);
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+    // console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
