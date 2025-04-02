@@ -4,8 +4,6 @@ import https from 'https';
 import fs from 'fs';
 
 // Rutas de tus certificados SSL
-const SSL_KEY_PATH = '/home/adminweb/cert.key';
-const SSL_CERT_PATH = '/home/adminweb/cert.pem';
 
 // Configuración de los certificados SSL
 const sslOptions = {
@@ -50,7 +48,6 @@ wss.on('connection', (ws) => {
 });
 
 // Iniciar el servidor HTTPS en el puerto 3002
-const PORT = 3002;
 server.listen(PORT, () => {
 });
 
@@ -75,13 +72,8 @@ import deviceRoutes from './routes/deviceRoute.js'
 import WebSocket from 'ws';
 import { setInterval } from 'timers';
 
-// import { InfluxDB } from '@influxdata/influxdb-client';
 
 // // Configuración de conexión
-// const url = 'https://us-central1-1.gcp.cloud2.influxdata.com/api/v2/query?bucket=UrbiCommBD&org=1cc07e3360f14fa4'; // Cambia esto a la URL de tu servidor InfluxDB
-// const token = 'u-gnlVuQE4K3WZXfZWVcRbNsfatzKQPBkHleQ_jZ7cLFtyKbcJ0z6T0_GzxM5F66f61LWYnBejp2fQYih5D4nw=='; // Reemplaza con tu token generado en InfluxDB
-// const org = '1cc07e3360f14fa4'; // Reemplaza con el nombre de tu organización
-// const bucket = 'UrbiCommBD'; // Reemplaza con el nombre de tu bucket
 // const query_params = 'Personas_Detectadas'
 // const device_uid = 'Franklin'
 
@@ -146,7 +138,6 @@ const __dirname = path.dirname(__filename);
 const fileSong = path.join(__dirname, 'songs-file.json');
 
 // Definir el puerto para el servidor
-const PORT = process.env.PORT || 3002;
 
 // Ruta principal
 app.get('/', async (req, res) => {
@@ -270,7 +261,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
         const { command, file } = req.body;
         const body = {
             "command": `${command}`,
-            "file": `https://urbicomm.io/uploads/${file.name}`
+            
         };
 
         await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
@@ -308,52 +299,6 @@ app.post('/lights', verifyTokken, async (req, res) => {
         console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
 
         // Configuración para la conexión MQTT
-        const mqttBrokerUrl = "qtt.akenza.io"
-        const username = process.env.MQTT_USERNAME;
-        const password = process.env.MQTT_PASSWORD;
-        const deviceId = process.env.MQTT_DEVICE_ID;
-        const topic = `${deviceId}`;
-
-        var options = {
-            connectTimeout: 5 * 1000,
-            reconnectPeriod: 0,
-            clientId: "akenza-example",
-            username: username,
-            password: password,
-        };
-
-        const body = {
-            "state": command,
-            "color": {
-                "r": red,
-                "g": green,
-                "b": blue
-            },
-            "effect": "none",
-            "brightness": 255
-        };
-
-        // Conectar al broker MQTT y publicar el mensaje
-        const client = await mqtt.connectAsync(
-            `tls://${mqttBrokerUrl}:8883`,
-            options,
-            false
-        );
-
-        // Manejar errores de conexión
-        client.on('error', (err) => {
-            console.log(`Error while sending data to MQTT broker: ${err}`);
-        });
-
-        // Publicar el mensaje en el topic
-        await client.publish(topic, JSON.stringify(body));
-        console.log(`Successfully published message to broker ${mqttBrokerUrl}`);
-
-        // Cerrar la conexión
-        await client.end();
-
-        // Responder al cliente con éxito
-
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
@@ -599,13 +544,6 @@ app.get('/read-upload-music', verifyTokken, (req, res) => {
 app.post('/audio', verifyTokken, async (req, res) => {
     console.log(req.body);
     try {
-        const { command, file } = req.body;
-        const body = {
-            "command": `${command}`,
-            "file": `https://urbicomm.io/uploads/${file.name}`
-        };
-
-        await sendMqttMessage(process.env.MQTT_DEVICE_AUDIO, body);
 
         // Responder al cliente una vez que se haya enviado el mensaje
         res.status(200).json({ message: 'Audio enviado correctamente' });
@@ -636,55 +574,7 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
 // Ruta para los colores
 app.post('/lights', verifyTokken, async (req, res) => {
     try {
-        const { red, green, blue, command } = req.body;
-        console.log(`Red: ${red}, Green: ${green}, Blue: ${blue}`);
-
-        // Configuración para la conexión MQTT
-        const mqttBrokerUrl = "qtt.akenza.io"
-        const username = process.env.MQTT_USERNAME;
-        const password = process.env.MQTT_PASSWORD;
-        const deviceId = process.env.MQTT_DEVICE_ID;
-        const topic = `${deviceId}`;
-
-        var options = {
-            connectTimeout: 5 * 1000,
-            reconnectPeriod: 0,
-            clientId: "akenza-example",
-            username: username,
-            password: password,
-        };
-
-        const body = {
-            "state": command,
-            "color": {
-                "r": red,
-                "g": green,
-                "b": blue
-            },
-            "effect": "none",
-            "brightness": 255
-        };
-
-        // Conectar al broker MQTT y publicar el mensaje
-        const client = await mqtt.connectAsync(
-            `tls://${mqttBrokerUrl}:8883`,
-            options,
-            false
-        );
-
-        // Manejar errores de conexión
-        client.on('error', (err) => {
-            console.log(`Error while sending data to MQTT broker: ${err}`);
-        });
-
-        // Publicar el mensaje en el topic
-        await client.publish(topic, JSON.stringify(body));
-        console.log(`Successfully published message to broker ${mqttBrokerUrl}`);
-
-        // Cerrar la conexión
-        await client.end();
-
-        // Responder al cliente con éxito
+        
 
 
     } catch (error) {

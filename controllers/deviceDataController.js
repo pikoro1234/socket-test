@@ -16,7 +16,7 @@
 //         // parametros de configuracion influx
 //         const token = `u-gnlVuQE4K3WZXfZWVcRbNsfatzKQPBkHleQ_jZ7cLFtyKbcJ0z6T0_GzxM5F66f61LWYnBejp2fQYih5D4nw==`
 //         const org = "1cc07e3360f14fa4";
-//         const url = `https://us-central1-1.gcp.cloud2.influxdata.com/api/v2/query?org=${org}`
+//         const url = 
 //         const influxDB = new InfluxDB({ url, token });
 //         const queryApi = influxDB.getQueryApi(org);
 //         // params query

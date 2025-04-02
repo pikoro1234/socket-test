@@ -5,7 +5,8 @@ import { config } from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// import regeneradas 
+// import files config/function/models, etc
+import { dic_origins_cors, dic_methods_cors, dic_headers_cors } from './no-trackin.js';
 import authMiddleware from './middleware/authMiddleware.js';
 import verifyMiddleware from './middleware/verifyMiddleware.js';
 import urbidermisRouter from './routes/urbidermis/urbidermisRouter.js';
@@ -34,9 +35,9 @@ app.use(cookieParser());
 
 // Generamos objeto cors que permite el envio y uso de cookies entre el servidor y el cliente
 const corsOptions = {
-    origin: [ "http://localhost:3004", "https://citydev.urbicomm.io", "https://www.urbidermis.com", "https://urbicomm.io", "https://citypre.urbicomm.io" ],
-    methods: [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
-    allowedHeaders: [ "Content-Type", "Authorization" ],
+    origin: dic_origins_cors,
+    methods: dic_methods_cors,
+    allowedHeaders: dic_headers_cors,
     credentials: true,
 };
 
@@ -177,5 +178,5 @@ app.use('/protected', apiKeyRouter);
 
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
-    // console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+    console.log(`Servidor ejecutándose en []://...:${PORT}`);
 });
