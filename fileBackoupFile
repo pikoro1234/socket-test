@@ -196,9 +196,7 @@ app.post('/append-upload', verifyTokken, async (req, res) => {
         });
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error al mover el archivo', details: err });
-        }
+    
     }
 })
 
@@ -229,9 +227,7 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
         })
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
-        }
+
     }
 })
 
@@ -263,9 +259,7 @@ app.get('/read-upload-music', verifyTokken, (req, res) => {
         })
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
-        }
+
     }
 })
 
@@ -286,9 +280,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 
@@ -305,9 +297,7 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
         })
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 
@@ -363,15 +353,11 @@ app.post('/lights', verifyTokken, async (req, res) => {
         await client.end();
 
         // Responder al cliente con éxito
-        if (!res.headersSent) {
-            res.json({ message: 'Datos de los colores publicados en MQTT correctamente' });
-        }
+
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 
@@ -380,30 +366,8 @@ app.post('/lights', verifyTokken, async (req, res) => {
 app.use('/devices', deviceRoutes)
 
 const connectToWebSocketWithApiKey = async () => {
-    const apiKey = "3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270"; // Reemplaza con tu xApiKey
-    const wsUrl = "wss://api.akenza.io/v3/data-streams";
 
-    const ws = new WebSocket(wsUrl, {
-        headers: {
-            "x-api-key": apiKey, // Incluye la xApiKey en los encabezados
-        },
-    });
 
-    ws.on("open", () => {
-        console.log("Conexión exitosa al WebSocket de Akenza con xApiKey");
-
-        // Mensaje de suscripción (si es necesario)
-        const subscriptionMessage = {
-            type: "subscribe",
-            // id: "uniqueMessageId123", // Opcional, pero recomendado
-            subscriptions: [
-                {
-                    assetId: "02557d0aad3a373e", // Reemplaza con el ID del dispositivo en Akenza
-                    // tagId: "tagId", // Opcional, si no hay assetId
-                    topic: "*", // Suscribirse a todos los temas
-                },
-            ],
-        };
 
         ws.send(JSON.stringify(subscriptionMessage));
         console.log("Mensaje de suscripción enviado:", subscriptionMessage);
@@ -461,30 +425,13 @@ import deviceRoutes from './routes/deviceRoute.js'
 // wobsocket akenza 
 import WebSocket from 'ws';
 const connectToWebSocketWithApiKey = async () => {
-    const apiKey = "3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270"; // Reemplaza con tu xApiKey
-    const wsUrl = "wss://api.akenza.io/v3/data-streams";
 
-    const ws = new WebSocket(wsUrl, {
-        headers: {
-            "x-api-key": apiKey, // Incluye la xApiKey en los encabezados
-        },
-    });
 
     ws.on("open", () => {
         console.log("Conexión exitosa al WebSocket de Akenza con xApiKey");
 
         // Mensaje de suscripción (si es necesario)
-        const subscriptionMessage = {
-            type: "subscribe",
-            // id: "uniqueMessageId123", // Opcional, pero recomendado
-            subscriptions: [
-                {
-                    assetId: "02557d0aad3a373e", // Reemplaza con el ID del dispositivo en Akenza
-                    // tagId: "tagId", // Opcional, si no hay assetId
-                    topic: "*", // Suscribirse a todos los temas
-                },
-            ],
-        };
+
 
         ws.send(JSON.stringify(subscriptionMessage));
         console.log("Mensaje de suscripción enviado:", subscriptionMessage);
@@ -581,10 +528,7 @@ app.post('/append-upload', verifyTokken, async (req, res) => {
             appendInFile(fileSong, file, req.body.horaForm, req.body.diasForm)
         });
     } catch (error) {
-        console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error al mover el archivo', details: err });
-        }
+
     }
 })
 
@@ -615,9 +559,7 @@ app.post('/edit-upload/:id', verifyTokken, async (req, res) => {
         })
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
-        }
+
     }
 })
 
@@ -649,9 +591,7 @@ app.get('/read-upload-music', verifyTokken, (req, res) => {
         })
     } catch (error) {
         console.error(`Error recived file: ${error.stack}`);
-        if (!res.headersSent) {
-            return res.status(500).json({ error: 'Error en datos del servidor', details: error });
-        }
+
     }
 })
 
@@ -672,9 +612,7 @@ app.post('/audio', verifyTokken, async (req, res) => {
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 
@@ -691,9 +629,7 @@ app.get('/time-song-trigger', verifyTokken, (req, res) => {
         })
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 
@@ -749,15 +685,11 @@ app.post('/lights', verifyTokken, async (req, res) => {
         await client.end();
 
         // Responder al cliente con éxito
-        if (!res.headersSent) {
-            res.json({ message: 'Datos de los colores publicados en MQTT correctamente' });
-        }
+
 
     } catch (error) {
         console.error(`Error: ${error.stack}`);
-        if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al procesar la solicitud' });
-        }
+
     }
 })
 

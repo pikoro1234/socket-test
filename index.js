@@ -33,7 +33,7 @@ app.use(cookieParser());
 
 // Generamos objeto cors que permite el envio y uso de cookies entre el servidor y el cliente
 const corsOptions = {
-    origin: [ "http://localhost:3004", "https://citydev.urbicomm.io", "https://www.urbidermis.com", "https://urbicomm.io","https://citypre.urbicomm.io" ],
+    origin: [ "http://localhost:3004", "https://citydev.urbicomm.io", "https://www.urbidermis.com", "https://urbicomm.io", "https://citypre.urbicomm.io" ],
     methods: [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
     allowedHeaders: [ "Content-Type", "Authorization" ],
     credentials: true,
@@ -64,7 +64,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //********* API
 
 // insert registre
-app.use('/urbidermis-download', urbidermisRouter); // File downloader to urbidermis web
+app.use('/urbidermis-download', authMiddleware, urbidermisRouter); // File downloader to urbidermis web
 
 // auth router
 app.use('/auth', authRouter); // Login, Logout, Refresh

@@ -1,4 +1,4 @@
-import { uri_primary } from '../../no-trackin.js';
+import { uri_primary, header_http_urbicomm } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
 import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel } from '../../models/devices/deviceModel.js';
@@ -64,8 +64,7 @@ export const importDevices = async (req, res) => {
 
         const method = 'GET'
         const uri = `${uri_primary}/devices/getter-devices/`
-        const headers = { "Content-Type": "application/json", }
-        const response = await customFetch(method, uri, headers, {})
+        const response = await customFetch(method, uri, header_http_urbicomm, {})
 
         const insertDevicesDb = await importDevicesModel(response.data)
 
@@ -86,11 +85,7 @@ export const getMyDetailsDevice = async (req, res) => {
 
     try {
 
-        // de momento guardamos las variables de id/rol del usuario
         const id = req.apiAccess ? req.position_user : req.user.id;
-        // const role_id = req.apiAccess ? req.position_rol.role_id : req.user.role_id;
-
-        console.log(req.params);
 
         if (!id) {
             return res.status(403).json({ success: false, message: "Token inválido" });

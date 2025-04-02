@@ -82,9 +82,10 @@ export const importDevicesModel = async (data) => {
 
                 if (resultExistDevice[ 0 ]) {
 
-                    const queryUpdate = 'UPDATE devices SET type=?, description=?, latitude=?, longitude=? WHERE id_device = ?';
+                    const queryUpdate = 'UPDATE devices SET id_reference=?, type=?, description=?, latitude=?, longitude=? WHERE id_device = ?';
 
                     const valuesUpdate = [
+                        id_reference,
                         type,
                         description,
                         latitude,
@@ -136,8 +137,9 @@ export const getMyDetailsDeviceModel = async (id_device) => {
 
         const method = 'GET'
         const uri = `${uri_root_dashboard}/devices/${id_device}`
-        uri_root_dashboard
         const result = await customFetch(method, uri, header_api_key_extern, {})
+
+        console.log(result);
 
         if (!result.success) {
 

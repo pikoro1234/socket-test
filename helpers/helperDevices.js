@@ -38,6 +38,7 @@ export const mappedStructDevice = (typeDevice, response) => {
             device_workspace_data: filterCustomField(response.customFields, 'workspace').STRING,
             device_zona: filterCustomField(response.customFields, 'Timezone').STRING,
             device_coordenadas: filterCustomField(response.customFields, 'Coordenadas').GPS_COORDINATES,
+            device_tags: response.tags,
             device_params: filterCustomField(response.customFields, 'Params').JSON,
             device_config: filterCustomField(response.customFields, 'Config').JSON
         }

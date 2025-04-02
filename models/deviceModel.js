@@ -12,10 +12,7 @@
 //     try {
 //         const response = await fetch('apidash/v3/assets/list?size=50', {
 //             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'x-api-key': `3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270`
-//             },
+
 //             body: JSON.stringify({
 //                 organizationId:",2814c3d718dd1526
 //                 workspaceIds: workspaceIds
@@ -35,13 +32,7 @@
 // mostrar datos de un solo dispositivo --> Desde la API de akenza
 // export const fetchDataDevice = async (deviceId) => {
 //     try {
-//         const response = await fetch(`apidash/devices/${deviceId}`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'x-api-key': `3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270`
-//             }
-//         })
+
 
 //         if (!response.ok) { throw new Error(`Error con la API : ${response.statusText}`); }
 
@@ -57,11 +48,7 @@
 //     // console.log(deviceBody);
 //     try {
 //         const response = await fetch(`apidash/devices/${deviceId}`, {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'x-api-key': `3beff9bb15cd6dd7.06e97757-5b92-4967-9437-a0a949c43270`
-//             },
+
 //             body: JSON.stringify(deviceBody),
 //         })
 
