@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 
 // import regeneradas 
 import authMiddleware from './middleware/authMiddleware.js';
+import verifyMiddleware from './middleware/verifyMiddleware.js';
 import urbidermisRouter from './routes/urbidermis/urbidermisRouter.js';
 import authRouter from './routes/users/authRouter.js'
 import userRouter from './routes/users/userRouter.js';
@@ -63,8 +64,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //********* API
 
-// insert registre
-app.use('/urbidermis-download', authMiddleware, urbidermisRouter); // File downloader to urbidermis web
+// insert registre files to urbidermis web
+app.use('/urbidermis-download', verifyMiddleware, urbidermisRouter); // File downloader to urbidermis web
 
 // auth router
 app.use('/auth', authRouter); // Login, Logout, Refresh
