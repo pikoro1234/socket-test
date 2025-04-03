@@ -7,7 +7,7 @@ export const getProcessData = async (req, res) => {
         if (req.apiAccess) {
 
             if (!req.body.prompt) {
-                return res.status(400).json({ message: "Bad Request..." })
+                return res.status(400).json({ success: false, message: "Bad Request..." })
             }
 
             console.log(req.body.prompt);
@@ -69,14 +69,14 @@ export const getProcessData = async (req, res) => {
                 ]
             }
 
-            return res.status(200).json({ message: send_data })
+            return res.status(200).json({ success: true, message: send_data })
         }
 
-        return res.status(401).json({ menssage: "no se pudo validad el token" })
+        return res.status(401).json({ success: false, menssage: "no se pudo validad el token" })
 
     } catch (error) {
 
         console.log(error);
-        return res.status(500).json({ message: "Internal server error..." })
+        return res.status(500).json({ success: false, message: "Internal server error..." })
     }
 }

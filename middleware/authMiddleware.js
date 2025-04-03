@@ -47,7 +47,7 @@ const authMiddleware = async (req, res, next) => {
         }
     }
 
-    return res.status(401).json({ message: "No autorizado" });
+    return res.status(401).json({ success: false, message: "No autorizado" });
 }
 
 export default authMiddleware;
@@ -59,11 +59,11 @@ export default authMiddleware;
 
 //     const token = req.cookies.access_token;
 
-//     if (!token) return res.status(401).json({ message: "No autorizado" });
+//     if (!token) return res.status(401).json({ success: false, message: "No autorizado" });
 
 //     jwt.verify(token, process.env.SECRET_TOKKEN, (err, user) => {
 
-//         if (err) return res.status(4003).json({ message: "Token inválido" });
+//         if (err) return res.status(403).json({ success: false, message: "Token inválido" });
 
 //         req.user = user;
 

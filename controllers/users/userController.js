@@ -7,17 +7,17 @@ export const getUserData = async (req, res) => {
         const userId = req.apiAccess ? req.position_user : req.user.id;
 
         if (!userId) {
-            return res.status(401).json({ message: "User no autorizado." });
+            return res.status(401).json({ success: false, message: "User no autorizado." });
         }
 
         const response = await getUserDataModel(userId);
 
         if (response === null) {
 
-            return res.status(404).json({ message: "Not found" })
+            return res.status(404).json({ success: false, message: "Not found" })
         }
 
-        return res.status(200).json({ message: response })
+        return res.status(200).json({ success: true, message: response })
 
     } catch (error) {
         console.log(error);
@@ -31,17 +31,17 @@ export const getUserProjects = async (req, res) => {
         const userId = req.apiAccess !== undefined ? req.position_user : req.user.id;
 
         if (!userId) {
-            return res.status(401).json({ message: "User no autorizado." });
+            return res.status(401).json({ success: false, message: "User no autorizado." });
         }
 
         const response = await getUserProjectsModel(req);
 
         if (response.length === 0) {
 
-            return res.status(200).json({ message: "Not found" });
+            return res.status(404).json({ success: false, message: "Not found" });
         }
 
-        return res.status(200).json({ message: response });
+        return res.status(200).json({ success: true, message: response });
 
     } catch (error) {
         console.log(error);

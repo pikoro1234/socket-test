@@ -1,7 +1,9 @@
+import { InfluxDB } from '@influxdata/influxdb-client';
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
-import { helperGetClientUser } from '../../helpers/helperUsers.js';
 import { customFetch } from '../../services/custom.js';
-import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern, uri_root_dashboard } from '../../no-trackin.js';
+import { helperGetClientUser } from '../../helpers/helperUsers.js';
+import { formatDeviceData } from '../../helpers/helperDevices.js';
+import { header_api_key_extern, uri_get_assets_extern, organizacion_id_extern, uri_root_dashboard, url, token, org } from '../../no-trackin.js';
 
 export const getDevicesModel = async (idUser, idRol) => {
 
@@ -129,7 +131,7 @@ export const importDevicesModel = async (data) => {
         console.error("Error general:", error);
         return 0;
     }
-};
+}
 
 export const getMyDetailsDeviceModel = async (id_device) => {
 
@@ -150,6 +152,68 @@ export const getMyDetailsDeviceModel = async (id_device) => {
 
     } catch (error) {
 
+        console.log(error);
+    }
+}
+
+export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, start, end) => {
+
+    try {
+
+        const filterFieldsByType = {
+            Solana: [ "humedad", "temperatura", "vBatt", "puerta", "agua", "duration" ],
+            Franklin: [ "campo1", "campo2", "campo3" ],
+            Basic: [ "campoX", "campoY" ],
+        };
+
+        const fields = filterFieldsByType[ type ] || [];
+
+        const string_filter_avg = fields.length ? `|> filter(fn: (r) => ${fields.map(f => `r._field == "${f}"`).join(" or ")})` : "";
+
+        const influxDB = new InfluxDB({ url, token });
+        const queryApi = influxDB.getQueryApi(org);
+
+        return new Promise((resolve, reject) => {
+            const response = [];
+            const fluxQuery =
+                mode === "summary"
+                    ? `from(bucket: "${environment}")
+                    |> range(start: ${start}, stop: ${end}T23:50:00Z)
+                    |> filter(fn: (r) => r._measurement != "traces")
+                    |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+                    ${string_filter_avg}
+                    |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+                    |> sort(columns: ["_time"], desc: false)`
+                    : `from(bucket: "${environment}")
+                    |> range(start: ${start}, stop: ${end}T23:50:00Z)
+                    |> filter(fn: (r) => r._measurement != "traces")
+                    |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+                    |> sort(columns: ["_time"], desc: false)`;
+
+            // print query debug
+            console.log(fluxQuery);
+
+            queryApi.queryRows(fluxQuery, {
+                next(row, tableMeta) {
+                    const data = tableMeta.toObject(row);
+                    response.push(data);
+                },
+                error(error) {
+                    console.error('Error al leer los datos:', error);
+                    reject({ error: "Error al obtener datos de InfluxDB", details: error });
+                },
+                complete() {
+                    console.log('Consulta completada.');
+                    // console.log(response);
+                    const formattedData = formatDeviceData(type, mode, response);
+                    console.log(formattedData);
+                    resolve(formattedData);
+                    // resolve(response);
+                },
+            });
+        });
+
+    } catch (error) {
         console.log(error);
     }
 }

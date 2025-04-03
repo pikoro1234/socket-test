@@ -21,14 +21,14 @@ export const generateApiKey = async (req, res) => {
 
         if (response <= 0) {
 
-            return res.status(500).json({ message: "error al generar token" })
+            return res.status(500).json({ success: false, message: "error al generar token" })
         }
 
-        return res.status(200).json({ message: textApiKey, hash: hashApiKey });
+        return res.status(200).json({ success: false, message: textApiKey, hash: hashApiKey });
 
     } catch (error) {
 
         console.log(error);
-        return res.status(500).json({ message: "error al generar token" })
+        return res.status(500).json({ success: false, message: "error al generar token" })
     }
 }

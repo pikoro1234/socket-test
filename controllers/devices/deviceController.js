@@ -1,7 +1,7 @@
 import { uri_primary, header_http_urbicomm } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
-import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel } from '../../models/devices/deviceModel.js';
+import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel, getMyDataHistoricDeviceModel } from '../../models/devices/deviceModel.js';
 
 export const getDevices = async (req, res) => {
 
@@ -16,7 +16,7 @@ export const getDevices = async (req, res) => {
 
         const response = await getDevicesModel(id, role_id);
 
-        return res.status(200).json({ message: response })
+        return res.status(200).json({ success: true, message: response })
 
     } catch (error) {
 
@@ -95,15 +95,48 @@ export const getMyDetailsDevice = async (req, res) => {
 
         if (!response.success) {
 
-            return res.status(404).json({ message: "Not Found..." })
+            return res.status(404).json({ success: false, message: "Not Found..." })
         }
 
         const transformData = mappedStructDevice(response.data.name, response.data);
 
-        return res.status(200).json({ message: transformData })
+        return res.status(200).json({ success: true, message: transformData })
 
     } catch (error) {
 
         console.log(error);
+    }
+}
+
+export const getMyDataHistoricDevice = async (req, res) => {
+
+    try {
+
+        const idCookie = req.apiAccess ? req.position_user : req.user.id;
+
+        if (!idCookie) { return res.status(403).json({ success: false, message: "Token inválido" }); }
+
+        if (!req.params.id) { return res.status(404).json({ success: false, message: "Not Found..." }); }
+
+        if (!req.body.environment) { return res.status(404).json({ success: false, message: "Environment not Found..." }); }
+
+        if (!req.body.type) { return res.status(404).json({ success: false, message: "Type not Found..." }); }
+
+        const { id } = req.params;
+        const { environment, type, mode, start, end } = req.body
+
+        const response = await getMyDataHistoricDeviceModel(id, environment, type, mode, start, end);
+
+        if (!response) {
+
+            return res.status(404).json({ success: false, message: response })
+        }
+
+        return res.status(200).json({ success: true, message: response })
+
+    } catch (error) {
+
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal Error" })
     }
 }

@@ -19,12 +19,12 @@ const verifyMiddleware = async (req, res, next) => {
         } catch (error) {
 
             console.warn("API Key required...");
-            return res.status(401).json({ message: "Unauthorized" });
+            return res.status(401).json({ success: false, message: "Unauthorized" });
 
         }
     }
 
-    return res.status(401).json({ message: "No autorizado" });
+    return res.status(401).json({ success: false, message: "No autorizado" });
 
 }
 export default verifyMiddleware;

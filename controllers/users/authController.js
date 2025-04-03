@@ -9,11 +9,11 @@ export const loginUser = async (req, res) => {
         const { username, userpassword } = req.body;
 
         if (!username || username === '') {
-            return res.status(400).json({ message: 'User/Password Required' });
+            return res.status(400).json({ success: false, message: 'User/Password Required' });
         }
 
         if (!userpassword || userpassword === '') {
-            return res.status(400).json({ message: 'User/Password Required' });
+            return res.status(400).json({ success: false, message: 'User/Password Required' });
         }
 
         const response = await loginUserModel(req.body);
@@ -34,17 +34,17 @@ export const loginUser = async (req, res) => {
                 httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
 
-            return res.json({ message: "Login correcto", success: true });
+            return res.json({ success: true, message: "Login correcto" });
 
         } else {
 
-            res.json({ message: "Login incorrecto", success: false });
+            res.json({ success: fals, message: "Login incorrecto" });
         }
 
     } catch (error) {
 
         console.error(error);
-        return res.status(500).json({ message: "Error usuario no válido" });
+        return res.status(500).json({ success: false, message: "Error usuario no válido" });
     }
 };
 
@@ -60,12 +60,12 @@ export const logoutUser = async (req, res) => {
             httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
         });
 
-        return res.json({ message: "Logout exitoso", success: true });
+        return res.json({ success: true, message: "Logout exitoso" });
 
     } catch (error) {
 
         console.error("Error en logout:", error);
-        return res.status(500).json({ message: "Error al cerrar sesión" });
+        return res.status(500).json({ success: false, message: "Error al cerrar sesión" });
     }
 }
 
@@ -79,7 +79,7 @@ export const refreshToken = async (req, res) => {
 
         if (!refreshToken) {
 
-            return res.status(401).json({ message: "Refresh token no proporcionado" });
+            return res.status(401).json({ success: false, message: "Refresh token no proporcionado" });
         }
 
         // verificamos que el token es valido
@@ -87,7 +87,7 @@ export const refreshToken = async (req, res) => {
 
             if (err) {
 
-                return res.status(403).json({ message: "Refresh token inválido o expirado" });
+                return res.status(403).json({ success: false, message: "Refresh token inválido o expirado" });
             }
 
             // generamos nuevo token_access si refresh_token es correcto
@@ -103,6 +103,6 @@ export const refreshToken = async (req, res) => {
     } catch (error) {
 
         console.error("Error al refrescar token", error);
-        res.status(500).json({ message: "Error del servidor" });
+        res.status(500).json({ success: false, message: "Error del servidor" });
     }
 }

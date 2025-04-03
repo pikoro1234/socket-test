@@ -8,17 +8,17 @@ export const createProjectData = async (req, res) => {
 
         if (!identificador || !nombre || !pais || !ciudad || !direccion) {
 
-            return res.status(400).json({ message: "Bad Request" })
+            return res.status(400).json({ success: false, message: "Bad Request" })
         }
 
         const response = await createProjectDataModel(req.body);
 
         if (response > 0) {
 
-            return res.status(200).json({ message: "proyecto creado correctamente" })
+            return res.status(200).json({ success: true, message: "proyecto creado correctamente" })
         }
 
-        return res.status(304).json({ message: "Not Modified" })
+        return res.status(304).json({ success: false, message: "Not Modified" })
 
     } catch (error) {
 
@@ -46,7 +46,7 @@ export const getProjectData = async (req, res) => {
 
         const response = await getProjectDataModel(id, rolUser);
 
-        return res.status(200).json({ message: response })
+        return res.status(200).json({ success: true, message: response })
 
     } catch (error) {
         console.log(error);

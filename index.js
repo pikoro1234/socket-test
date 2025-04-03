@@ -58,7 +58,7 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3002;
 
 // ruta principal Urbicomm.io
-app.get('/', async (req, res) => { try { res.sendFile(path.join(__dirname, 'index.html')); } catch (error) { res.status(500).json({ error: 'Error en levantar la pagina principal' }); } });
+app.get('/', async (req, res) => { try { res.sendFile(path.join(__dirname, 'index.html')); } catch (error) { res.status(500).json({ success: false, message: 'Error en levantar la pagina principal' }); } });
 
 // ruta doc -> generada por swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
