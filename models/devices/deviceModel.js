@@ -175,20 +175,47 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
         return new Promise((resolve, reject) => {
             const response = [];
-            const fluxQuery =
-                mode === "summary"
-                    ? `from(bucket: "${environment}")
+
+            let fluxQuery = `from(bucket: "${environment}")
+                    |> range(start: ${start}, stop: ${end}T23:50:00Z)
+                    |> filter(fn: (r) => r._measurement != "traces")
+                    |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+                    |> sort(columns: ["_time"], desc: false)`;
+
+            if (mode === 'summary') {
+
+                fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
                     |> filter(fn: (r) => r._measurement != "traces")
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
                     ${string_filter_avg}
                     |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
                     |> sort(columns: ["_time"], desc: false)`
-                    : `from(bucket: "${environment}")
+            }
+
+            if (mode === 'last') {
+                fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
                     |> filter(fn: (r) => r._measurement != "traces")
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
-                    |> sort(columns: ["_time"], desc: false)`;
+                    ${string_filter_avg}
+                    |> last()`
+            }
+            
+            // const fluxQuery =
+            //     mode === "summary"
+            //         ? `from(bucket: "${environment}")
+            //         |> range(start: ${start}, stop: ${end}T23:50:00Z)
+            //         |> filter(fn: (r) => r._measurement != "traces")
+            //         |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+            //         ${string_filter_avg}
+            //         |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+            //         |> sort(columns: ["_time"], desc: false)`
+            //         : `from(bucket: "${environment}")
+            //         |> range(start: ${start}, stop: ${end}T23:50:00Z)
+            //         |> filter(fn: (r) => r._measurement != "traces")
+            //         |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+            //         |> sort(columns: ["_time"], desc: false)`;
 
             // print query debug
             console.log(fluxQuery);
