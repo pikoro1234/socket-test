@@ -51,7 +51,7 @@ export const getDevicesNoFilter = async (req, res) => {
             return res.status(200).json(mappedDevices);
         }
 
-        return res.status(404).json({ message: "Not found." });
+        return res.status(404).json({ success: false, message: "Not found." });
 
     } catch (error) {
         console.log(error);
@@ -69,15 +69,15 @@ export const importDevices = async (req, res) => {
         const insertDevicesDb = await importDevicesModel(response.data)
 
         if (insertDevicesDb > 0) {
-            return res.status(200).json({ message: "Inserción completa" })
+            return res.status(200).json({ success: true, message: "Inserción completa" })
         }
 
-        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos" })
+        return res.status(503).json({ success: false, message: "Error en la inseción se borraron todos los datos" })
 
     } catch (error) {
 
         console.log(error);
-        return res.status(503).json({ message: "Error en la inseción se borraron todos los datos try/catch" })
+        return res.status(503).json({ success: false, message: "Error en la inseción se borraron todos los datos try/catch" })
     }
 }
 
