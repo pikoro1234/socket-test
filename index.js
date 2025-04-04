@@ -16,6 +16,7 @@ import projectRouter from './routes/projects/projectRouter.js';
 import deviceRouter from './routes/devices/deviceRouter.js';
 import apiKeyRouter from './routes/apiKey/apiKeyRouter.js';
 import iaRouter from './routes/iA/iaRouter.js';
+import webhookRouter from './routes/webHook/webhookRouter.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
@@ -79,6 +80,9 @@ app.use('/projects', authMiddleware, projectRouter) // Project || sub-projects -
 
 // crud devices
 app.use('/devices', authMiddleware, deviceRouter); // Devices --- Get - Post - Put
+
+// webhooks for data extern import or export
+app.use('/webhooks', verifyMiddleware, webhookRouter);
 
 // data procesing for IA V.1
 app.use('/data-ia', authMiddleware, iaRouter)  // query automatice sql - fluxed queries
