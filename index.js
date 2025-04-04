@@ -16,7 +16,7 @@ import projectRouter from './routes/projects/projectRouter.js';
 import deviceRouter from './routes/devices/deviceRouter.js';
 import apiKeyRouter from './routes/apiKey/apiKeyRouter.js';
 import iaRouter from './routes/iA/iaRouter.js';
-import webhookRouter from './routes/webHook/webhookRouter.js';
+import webhookRouter from './routes/webhook/webhookRouter.js';
 
 // import librerias para generar documentacion
 import swaggerUi from 'swagger-ui-express';
