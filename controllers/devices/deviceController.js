@@ -1,7 +1,7 @@
 import { uri_primary, header_http_urbicomm } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
-import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel, getMyDataHistoricDeviceModel } from '../../models/devices/deviceModel.js';
+import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel, getMyDataHistoricDeviceModel, getAllNoticesModel } from '../../models/devices/deviceModel.js';
 
 export const getDevices = async (req, res) => {
 
@@ -138,5 +138,32 @@ export const getMyDataHistoricDevice = async (req, res) => {
 
         console.log(error);
         return res.status(500).json({ success: false, message: "Internal Error" })
+    }
+}
+
+export const getAllNotices = async (req, res) => {
+
+    try {
+
+        const idCookie = req.apiAccess ? req.position_user : req.user.id;
+
+        if (!idCookie) { return res.status(403).json({ success: false, message: "Token inválido" }); }
+
+        const devices = await getDevicesModel(req.user.id, req.user.role_id)
+
+        const result = await getAllNoticesModel(devices);
+
+        console.log(result);
+
+        if (result.length <= 0) {
+
+            return res.status(404).json({ success: false, message: 'No se encontraron warnings' })
+        }
+
+        return res.status(200).json({ success: true, message: result })
+
+    } catch (error) {
+
+        console.log(error);
     }
 }

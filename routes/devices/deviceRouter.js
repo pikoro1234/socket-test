@@ -1,5 +1,5 @@
 import express from 'express'
-import { getDevices, getDevicesNoFilter, importDevices, getMyDetailsDevice, getMyDataHistoricDevice } from '../../controllers/devices/deviceController.js'
+import { getDevices, getDevicesNoFilter, importDevices, getMyDetailsDevice, getMyDataHistoricDevice, getAllNotices } from '../../controllers/devices/deviceController.js'
 
 const router = express.Router()
 
@@ -9,7 +9,7 @@ router.get('/getter-devices/', getDevicesNoFilter);
 
 router.post('/import-devices/', importDevices);
 
-// router.get('/notices/', getAllNotices);
+router.get('/notices/', getAllNotices);
 
 router.get('/:id/', getMyDetailsDevice);
 

@@ -201,7 +201,7 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
                     ${string_filter_avg}
                     |> last()`
             }
-            
+
             // const fluxQuery =
             //     mode === "summary"
             //         ? `from(bucket: "${environment}")
@@ -241,6 +241,36 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
         });
 
     } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getAllNoticesModel = async (devices) => {
+
+    try {
+
+        const allNotices = [];
+
+        for (const device of devices) {
+            const query = "SELECT * FROM `devices_warnings` WHERE id_device = ?";
+            const [ result ] = await pool_urbidata.query(query, [ device.id_device ]);
+            const mapped_obj = result.map(notice => ({
+                id_table_notice: notice.id,
+                id_notice: notice.id_warning,
+                id_device_notice: notice.id_device,
+                type_notice: notice.type_warning,
+                state_notice: notice.state,
+                timestamp_notice: notice.date_device,
+                date_notice: notice.date
+            }));
+
+            allNotices.push(...mapped_obj);
+        }
+
+        return allNotices;
+
+    } catch (error) {
+
         console.log(error);
     }
 }
