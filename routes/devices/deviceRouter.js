@@ -9,8 +9,11 @@ router.get('/getter-devices/', getDevicesNoFilter);
 
 router.post('/import-devices/', importDevices);
 
+// router.get('/notices/', getAllNotices);
+
 router.get('/:id/', getMyDetailsDevice);
 
 router.post('/:id/history/', getMyDataHistoricDevice);
+
 
 export default router
