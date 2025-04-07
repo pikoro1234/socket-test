@@ -12,41 +12,64 @@ export const insertEventsModel = async (data) => {
 
     ]
 
-    let id_warning = '', type_warning = '', state_warning = '';
+    let id_warning = 0, type_warning = '', state_warning = '', date_device = '';
 
     try {
 
+        const idSensor = data.device.deviceId;
+
         if (data.device.name === 'Solana') {
 
-            const { idSensor, timeStamp, idevent, value, extradata } = data.data
+            const { idevent, value, extradata, vBatt } = data.data
 
-            if (idevent === 'door' && extradata === 'open') {
+            if (idevent === 'door' && extradata.toLowerCase() === 'open') {
 
                 id_warning = diccionary_warnings[ 0 ].id
 
                 type_warning = diccionary_warnings[ 0 ].value
 
                 state_warning = 'Activated'
+
+                date_device = data.data.timeStamp
             }
 
-            if (idevent === 'water_level' && extradata === 'Low') {
+            else if (idevent === 'water_level' && extradata === 'Low') {
 
                 id_warning = diccionary_warnings[ 2 ].id
 
                 type_warning = diccionary_warnings[ 2 ].value
 
                 state_warning = 'Activated'
+
+                date_device = data.data.timeStamp
             }
 
-            const sql_insert = "INSERT INTO`devices_warnings`(`id_device`, `id_warning`, `type_warning`, `state`, `date_device`) VALUES(?,?,?,?,?)";
+            else if (vBatt < 11) {
 
-            const [ result ] = await pool_urbidata.query(sql_insert, [ idSensor, id_warning, type_warning, state_warning, timeStamp ]);
+                id_warning = diccionary_warnings[ 3 ].id
 
-            return result.affectedRows;
+                type_warning = diccionary_warnings[ 3 ].value
+
+                state_warning = 'Activated'
+
+                date_device = data.data.tiempo
+            }
+
+            if (id_warning !== 0 && type_warning !== '' && state_warning !== '' && date_device !== '') {
+
+                console.log(data);
+
+                const sql_insert = "INSERT INTO`devices_warnings`(`id_device`, `id_warning`, `type_warning`, `state`, `date_device`) VALUES(?,?,?,?,?)";
+
+                const [ result ] = await pool_urbidata.query(sql_insert, [ idSensor, id_warning, type_warning, state_warning, date_device ]);
+
+                return result.affectedRows;
+            }
         }
 
     } catch (error) {
 
         console.log(error);
+        return 0;
     }
 }
