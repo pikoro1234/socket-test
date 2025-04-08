@@ -160,14 +160,17 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
     try {
 
+        let measurement_permissions = '|> filter(fn: (r) => r._measurement != "traces" and r._measurement != "canceled_irrigations")';
+
+        if (type === 'Basic') measurement_permissions = '|> filter(fn: (r) => r._measurement == "charger1" or r._measurement == "charger2" or r._measurement == "charger3" or r._measurement == "status_impact" or r._measurement == "status_temp")';
+
         const filterFieldsByType = {
             Solana: [ "humedad", "temperatura", "vBatt", "puerta", "agua", "duration" ],
+            Basic: [ "power1", "power2", "power3", "magnitude", "temperatura" ],
             Franklin: [ "campo1", "campo2", "campo3" ],
-            Basic: [ "campoX", "campoY" ],
         };
 
         const fields = filterFieldsByType[ type ] || [];
-
         const string_filter_avg = fields.length ? `|> filter(fn: (r) => ${fields.map(f => `r._field == "${f}"`).join(" or ")})` : "";
 
         const influxDB = new InfluxDB({ url, token });
@@ -186,11 +189,11 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
                 fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
-                    |> filter(fn: (r) => r._measurement != "traces" and r._measurement != "canceled_irrigations")
+                    ${measurement_permissions}
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
                     ${string_filter_avg}
                     |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-                    |> sort(columns: ["_time"], desc: false)`
+                    |> sort(columns: ["_time"], desc: false)`;
             }
 
             if (mode === 'last') {
@@ -199,23 +202,8 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
                     |> filter(fn: (r) => r._measurement != "traces")
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
                     ${string_filter_avg}
-                    |> last()`
+                    |> last()`;
             }
-
-            // const fluxQuery =
-            //     mode === "summary"
-            //         ? `from(bucket: "${environment}")
-            //         |> range(start: ${start}, stop: ${end}T23:50:00Z)
-            //         |> filter(fn: (r) => r._measurement != "traces")
-            //         |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
-            //         ${string_filter_avg}
-            //         |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-            //         |> sort(columns: ["_time"], desc: false)`
-            //         : `from(bucket: "${environment}")
-            //         |> range(start: ${start}, stop: ${end}T23:50:00Z)
-            //         |> filter(fn: (r) => r._measurement != "traces")
-            //         |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
-            //         |> sort(columns: ["_time"], desc: false)`;
 
             // print query debug
             console.log(fluxQuery);
