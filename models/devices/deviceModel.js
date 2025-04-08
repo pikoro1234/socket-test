@@ -186,7 +186,7 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
                 fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
-                    |> filter(fn: (r) => r._measurement != "traces")
+                    |> filter(fn: (r) => r._measurement != "traces" and r._measurement != "canceled_irrigations")
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
                     ${string_filter_avg}
                     |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
