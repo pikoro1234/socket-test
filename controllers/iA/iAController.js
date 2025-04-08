@@ -76,7 +76,7 @@ export const getProcessData = async (req, res) => {
             ]
         }
 
-        const static_response = `{"response": "Aquí tienes el estado de tus jardineras \n- JAT1007A: Puerta cerrada (<a href=\"/mapas/02c9d061ff686311\">02c9d061ff686311</a>)\n- JAT1005A: Puerta cerrada (<a href=\"/mapas/02d5029c2216f2bf\">02d5029c2216f2bf</a>)\n- JAT1003A: Puerta cerrada (<a href=\"/mapas/02c4819a475fe4ca\">02c4819a475fe4ca</a>)\n- JAT1009A: Puerta cerrada (<a href=\"/mapas/0234ccc76a2782bb\">0234ccc76a2782bb</a>)\n- JAT1008A: Puerta cerrada (<a href=\"/mapas/028443cf9667e55e\">028443cf9667e55e</a>)\n- JAT1002A: Puerta abierta (<a href=\"/mapas/02a88271804a3bd4\">02a88271804a3bd4</a>)\n- JAT1004A: Puerta cerrada (<a href=\"/mapas/02ffd0d907664d07\">02ffd0d907664d07</a>)\n- JAT1006A: Puerta cerrada (<a href=\"/mapas/0254bc752b6acdf6\">0254bc752b6acdf6</a>)\n\nSi necesitas más información, no dudes en preguntar."}`
+        const static_response = `{"response": "Aquí tienes el estado de tus jardineras \n- JAT1007A: Puerta cerrada (<a href=\"/mapas/02c9d061ff686311\">02c9d061ff686311</a>)\n- JAT1005A: Puerta cerrada (<a href=\"/mapas/02d5029c2216f2bf\">02d5029c2216f2bf</a>)\n- JAT1003A: Puerta cerrada (<a href=\"/mapas/02c4819a475fe4ca\">02c4819a475fe4ca</a>)\n- JAT1009A: Puerta cerrada (<a href=\"/mapas/0234ccc76a2782bb\">0234ccc76a2782bb</a>)\n- JAT1008A: Puerta cerrada (<a href=\"/mapas/0254bc752b6acdf6\">0254bc752b6acdf6</a>)\n\nSi necesitas más información, no dudes en preguntar."}`
 
         return res.status(200).json({ success: true, message: static_response })
         // }
