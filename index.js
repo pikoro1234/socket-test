@@ -171,9 +171,12 @@ app.use('/protected', apiKeyRouter);
 
 
 
+// import { publish_my_data_agent,chatAgentToClient } from './helpers/helperIa.js';
 
 
+// console.log(await publish_my_data_agent())
 
+// console.log(await chatAgentToClient('dime mis projects please'))
 
 
 

@@ -1,4 +1,4 @@
-import { uri_primary, header_http_urbicomm } from '../../no-trackin.js';
+import { header_http_urbicomm, uri_getter_device } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
 import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel, getMyDataHistoricDeviceModel, getAllNoticesModel } from '../../models/devices/deviceModel.js';
@@ -51,6 +51,8 @@ export const getDevicesNoFilter = async (req, res) => {
             return res.status(200).json(mappedDevices);
         }
 
+        functionDevicesNoFilter(mappedDevices)
+
         return res.status(404).json({ success: false, message: "Not found." });
 
     } catch (error) {
@@ -63,7 +65,7 @@ export const importDevices = async (req, res) => {
     try {
 
         const method = 'GET'
-        const uri = `${uri_primary}/devices/getter-devices/`
+        const uri = `${uri_getter_device}`
         const response = await customFetch(method, uri, header_http_urbicomm, {})
 
         const insertDevicesDb = await importDevicesModel(response.data)
