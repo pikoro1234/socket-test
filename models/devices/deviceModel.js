@@ -164,10 +164,12 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
         if (type === 'Basic') measurement_permissions = '|> filter(fn: (r) => r._measurement == "charger1" or r._measurement == "charger2" or r._measurement == "charger3" or r._measurement == "status_impact" or r._measurement == "status_temp")';
 
+        if (type === 'Franklin') measurement_permissions = '|> filter(fn: (r) => r._measurement == "airquality" or r.measurement == "sensors_data")'
+
         const filterFieldsByType = {
             Solana: [ "humedad", "temperatura", "vBatt", "puerta", "agua", "duration" ],
             Basic: [ "power1", "power2", "power3", "magnitude", "temperatura" ],
-            Franklin: [ "campo1", "campo2", "campo3" ],
+            Franklin: [ "pm1", "pm2", "pm4", "pm10", "temperatura", "humedad", "co2", "nox", "voc", "ina219_current", "ina219_power", "ina260_current", "ina260_power" ],
         };
 
         const fields = filterFieldsByType[ type ] || [];
@@ -181,8 +183,9 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
 
             let fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
-                    |> filter(fn: (r) => r._measurement != "traces")
+                    ${measurement_permissions}
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
+                    ${string_filter_avg}
                     |> sort(columns: ["_time"], desc: false)`;
 
             if (mode === 'summary') {
@@ -199,31 +202,30 @@ export const getMyDataHistoricDeviceModel = async (id, environment, type, mode, 
             if (mode === 'last') {
                 fluxQuery = `from(bucket: "${environment}")
                     |> range(start: ${start}, stop: ${end}T23:50:00Z)
-                    |> filter(fn: (r) => r._measurement != "traces")
+                    ${measurement_permissions}
                     |> filter(fn: (r) => r.akenzaDeviceId == "${id}")
                     ${string_filter_avg}
                     |> last()`;
             }
 
-            // print query debug
-            console.log(fluxQuery);
+            console.log(fluxQuery); // print query debug
 
             queryApi.queryRows(fluxQuery, {
                 next(row, tableMeta) {
+
                     const data = tableMeta.toObject(row);
                     response.push(data);
                 },
                 error(error) {
+
                     console.error('Error al leer los datos:', error);
                     reject({ error: "Error al obtener datos de InfluxDB", details: error });
                 },
                 complete() {
-                    console.log('Consulta completada.');
-                    // console.log(response);
-                    const formattedData = formatDeviceData(type, mode, response);
+
+                    const formattedData = formatDeviceData(type, response);
                     console.log(formattedData);
                     resolve(formattedData);
-                    // resolve(response);
                 },
             });
         });

@@ -60,6 +60,7 @@ export const mappedStructDevice = (typeDevice, response) => {
                 device_workspace_data: filterCustomField(response.customFields, 'workspace').STRING,
                 device_zona: filterCustomField(response.customFields, 'Timezone').STRING,
                 device_coordenadas: filterCustomField(response.customFields, 'Coordenadas').GPS_COORDINATES,
+                device_tags: response.tags,
             }
         }
 
@@ -91,7 +92,7 @@ export const mappedStructDevice = (typeDevice, response) => {
     }
 }
 
-export const formatDeviceData = (type, mode, data = []) => {
+export const formatDeviceData = (type, data = []) => {
 
     if (type === 'Solana') {
 
@@ -117,9 +118,8 @@ export const formatDeviceData = (type, mode, data = []) => {
         });
 
         return arrays_solana;
-    }
 
-    else if (type === 'Basic') {
+    } else if (type === 'Basic') {
 
         const arrays_basic = {
             array_power1: [],
@@ -141,5 +141,44 @@ export const formatDeviceData = (type, mode, data = []) => {
         });
 
         return arrays_basic;
+
+    } else {
+
+        const arrays_franklin = {
+            array_pm1: [],
+            array_pm2: [],
+            array_pm4: [],
+            array_pm10: [],
+            array_temperatura: [],
+            array_humedad: [],
+            array_co2: [],
+            array_nox: [],
+            array_voc: [],
+            array_ina219_current: [],
+            array_ina219_power: [],
+            array_ina260_current: [],
+            array_ina260_power: [],
+        }
+
+        data.forEach(({ _measurement: measurement, _field: field, _time: fecha, _value: valor }) => {
+
+            const response_item = { fecha, valor, field }
+
+            if (measurement === 'airquality' && field === 'pm1') arrays_franklin.array_pm1.push(response_item);
+            else if (measurement === 'airquality' && field === 'pm2') arrays_franklin.array_pm2.push(response_item);
+            else if (measurement === 'airquality' && field === 'pm4') arrays_franklin.array_pm4.push(response_item);
+            else if (measurement === 'airquality' && field === 'pm10') arrays_franklin.array_pm10.push(response_item);
+            else if (measurement === 'airquality' && field === 'temperatura') arrays_franklin.array_temperatura.push(response_item);
+            else if (measurement === 'airquality' && field === 'humedad') arrays_franklin.array_humedad.push(response_item);
+            else if (measurement === 'airquality' && field === 'co2') arrays_franklin.array_co2.push(response_item);
+            else if (measurement === 'airquality' && field === 'nox') arrays_franklin.array_nox.push(response_item);
+            else if (measurement === 'airquality' && field === 'voc') arrays_franklin.array_voc.push(response_item);
+            else if (measurement === 'sensors_data' && field === 'ina219_current') arrays_franklin.array_ina219_current.push(response_item);
+            else if (measurement === 'sensors_data' && field === 'ina219_power') arrays_franklin.array_ina219_power.push(response_item);
+            else if (measurement === 'sensors_data' && field === 'ina260_current') arrays_franklin.array_ina260_current.push(response_item);
+            else if (measurement === 'sensors_data' && field === 'ina260_power') arrays_franklin.array_ina260_power.push(response_item);
+        });
+
+        return arrays_franklin;
     }
 }
