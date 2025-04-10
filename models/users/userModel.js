@@ -4,7 +4,22 @@ export const getUserDataModel = async (userId) => {
 
     try {
 
-        const [ dataUser ] = await pool_urbidata.query("SELECT * FROM `users` JOIN user_roles ON users.uuid = user_roles.user_id WHERE uuid = ?", [ userId ]);
+        const query = `SELECT 
+        users.name,
+        users.surname,
+        users.email,
+        users.language,
+        users.phone,
+        users.country,
+        users.city,
+        users.address,
+        users.zip_code,
+        user_roles.role_id
+        FROM users 
+        JOIN user_roles ON users.uuid = user_roles.user_id 
+        WHERE uuid = ?`;
+
+        const [ dataUser ] = await pool_urbidata.query(query, [ userId ]);
 
         if (dataUser.length === 0) {
             return null;

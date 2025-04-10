@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { generateApiKeyModel } from '../../models/apiKey/apiKeyModel.js';
+import { insertApiKeyModelStaticPlatforms } from '../../models/apiKey/apiKeyModel.js';
 
-export const generateApiKey = async (req, res) => {
+export const generateApiKeyStaticPlatforms = async (req, res) => {
 
     try {
 
@@ -17,7 +17,7 @@ export const generateApiKey = async (req, res) => {
 
         const hashApiKey = await bcrypt.hash(textApiKey, 10);
 
-        const response = await generateApiKeyModel(app, hashApiKey);
+        const response = await insertApiKeyModelStaticPlatforms(app, hashApiKey);
 
         if (response <= 0) {
 

@@ -34,3 +34,27 @@ export const loginUserModel = async (objBody) => {
         console.log(error);
     }
 }
+
+export const generateKeyCommTempUserModel = async (idUser) => {
+
+    try {
+
+        const textApiKey = `mqtt_channel_id_${crypto.randomBytes(32).toString("hex")}`;
+        const hashApiKey = await bcrypt.hash(textApiKey, 10);
+        const expiresAt = new Date(Date.now() + 50 * 60 * 1000);
+
+        const query = "INSERT INTO user_mqtt_channels (user_id, mqtt_channel_id, expires_at) VALUES (?, ?, ?)";
+        const [ result ] = await pool_urbidata.query(query, [ idUser, hashApiKey, expiresAt ]);
+
+        if (result.affectedRows === 0) {
+
+            return { message: textApiKey, success: false }
+        }
+
+        return { message: textApiKey, success: true }
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}

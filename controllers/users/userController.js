@@ -12,6 +12,8 @@ export const getUserData = async (req, res) => {
 
         const response = await getUserDataModel(userId);
 
+        console.log(response);
+
         if (response === null) {
 
             return res.status(404).json({ success: false, message: "Not found" })

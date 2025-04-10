@@ -1,6 +1,6 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
 
-export const generateApiKeyModel = async (app, hashApiKey) => {
+export const insertApiKeyModelStaticPlatforms = async (app, hashApiKey) => {
 
     try {
 

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { loginUserModel } from '../../models/users/authModel.js';
+import { generateKeyCommTempUserModel, loginUserModel } from '../../models/users/authModel.js';
 import { getEntorno } from '../../services/custom.js';
 
 export const loginUser = async (req, res) => {
@@ -18,7 +18,9 @@ export const loginUser = async (req, res) => {
 
         const response = await loginUserModel(req.body);
 
-        if (response) {
+        const generate_key_comm = await generateKeyCommTempUserModel(response.uuid);
+
+        if (generate_key_comm.success) {
 
             const user = { id: response.uuid, username, role_id: response.rol_id };
 
@@ -34,7 +36,7 @@ export const loginUser = async (req, res) => {
                 httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
 
-            return res.json({ success: true, message: "Login correcto" });
+            return res.json({ success: true, message: "Login correcto", commtext: generate_key_comm.message });
 
         } else {
 
