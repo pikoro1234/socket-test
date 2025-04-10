@@ -149,40 +149,6 @@ app.use('/protected', apiKeyRouter);
 //   console.log("❌ Pregunta no reconocida");
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { publish_my_data_agent,chatAgentToClient } from './helpers/helperIa.js';
-
-
-// console.log(await publish_my_data_agent())
-
-// console.log(await chatAgentToClient('dime mis projects please'))
-
-
-
-
-
-
 // Iniciar el servidor
 const server = app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en []://...:${PORT}`);

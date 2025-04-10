@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { generateKeyCommTempUserModel, loginUserModel } from '../../models/users/authModel.js';
+import { getDataCompletModel } from '../../models/users/userModel.js';
+import { publish_my_data_agent } from '../../helpers/helperIa.js';
 import { getEntorno } from '../../services/custom.js';
 
 export const loginUser = async (req, res) => {
@@ -35,6 +37,19 @@ export const loginUser = async (req, res) => {
             res.cookie("refresh_token", refreshToken, {
                 httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
+
+            const data_complet_user = await getDataCompletModel(response.uuid, response.rol_id);
+
+            const data_agent = `{
+                "extra_data": {
+                "comm_key": "${generate_key_comm.message}",
+                "data": ${JSON.stringify(data_complet_user)}
+                }
+            }`
+
+            const data_response_agent = await publish_my_data_agent(data_agent);
+
+            console.log(data_response_agent);
 
             return res.json({ success: true, message: "Login correcto", commtext: generate_key_comm.message });
 
