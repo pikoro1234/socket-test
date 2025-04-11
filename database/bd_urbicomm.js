@@ -8,7 +8,7 @@ export const pool_urbicomm = mysql.createPool({
     host: process.env.HOST_DB_URBICOMM,
     user: process.env.USER_DB_URBICOMM,
     password: process.env.PASSWORD_DB_URBICOMM,
-    database: process.env.DATABASE_DB_URBICOMM,
+    database: process.env.DATABASE_DB_URBIDERMIS,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
