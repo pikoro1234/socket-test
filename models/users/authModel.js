@@ -58,3 +58,27 @@ export const generateKeyCommTempUserModel = async (idUser) => {
         console.log(error);
     }
 }
+
+export const deleteKeyCommTempUserModel = async (textKey) => {
+
+    try {
+
+        const [ rows ] = await pool_urbidata.query("SELECT id, mqtt_channel_id FROM user_mqtt_channels");
+
+        for (const row of rows) {
+            const match = await bcrypt.compare(textKey, row.mqtt_channel_id);
+
+            if (match) {
+                await pool_urbidata.query("DELETE FROM user_mqtt_channels WHERE id = ?", [ row.id ]);
+                return { success: true, message: "Canal eliminado" };
+            }
+        }
+
+        return { success: false, message: "No se encontró el canal para eliminar" };
+
+    } catch (error) {
+
+        console.error("Error al eliminar el canal MQTT:", error);
+        return { success: false, message: "Error interno del servidor" };
+    }
+}

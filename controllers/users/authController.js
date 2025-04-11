@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { generateKeyCommTempUserModel, loginUserModel } from '../../models/users/authModel.js';
+import { generateKeyCommTempUserModel, loginUserModel, deleteKeyCommTempUserModel } from '../../models/users/authModel.js';
 import { getDataCompletModel } from '../../models/users/userModel.js';
 import { publish_my_data_agent } from '../../helpers/helperIa.js';
 import { getEntorno } from '../../services/custom.js';
@@ -10,13 +10,9 @@ export const loginUser = async (req, res) => {
 
         const { username, userpassword } = req.body;
 
-        if (!username || username === '') {
-            return res.status(400).json({ success: false, message: 'User/Password Required' });
-        }
+        if (!username || username === '') return res.status(400).json({ success: false, message: 'User/Password Required' });
 
-        if (!userpassword || userpassword === '') {
-            return res.status(400).json({ success: false, message: 'User/Password Required' });
-        }
+        if (!userpassword || userpassword === '') return res.status(400).json({ success: false, message: 'User/Password Required' });
 
         const response = await loginUserModel(req.body);
 
@@ -47,15 +43,13 @@ export const loginUser = async (req, res) => {
                 }
             }`
 
-            const data_response_agent = await publish_my_data_agent(data_agent);
-
-            console.log(data_response_agent);
+            await publish_my_data_agent("/user_login", data_agent);
 
             return res.json({ success: true, message: "Login correcto", commtext: generate_key_comm.message });
 
         } else {
 
-            res.json({ success: fals, message: "Login incorrecto" });
+            return res.json({ success: fals, message: "Login incorrecto" });
         }
 
     } catch (error) {
@@ -76,6 +70,15 @@ export const logoutUser = async (req, res) => {
         res.clearCookie("refresh_token", {
             httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
         });
+
+        if (req.body.comm_chat_text) {
+
+            const data_agent = `{ "comm_key": "${req.body.comm_chat_text}" }`;
+
+            await publish_my_data_agent("/user_logout", data_agent);
+
+            await deleteKeyCommTempUserModel(req.body.comm_chat_text);
+        }
 
         return res.json({ success: true, message: "Logout exitoso" });
 

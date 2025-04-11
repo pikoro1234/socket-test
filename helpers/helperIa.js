@@ -1,7 +1,7 @@
 import mqtt from 'async-mqtt';
 import { mqtt_uri_local } from '../no-trackin.js';
 
-export const publish_my_data_agent = (dataUser) => {
+export const publish_my_data_agent = (topicUser, dataUser) => {
 
     return new Promise((resolve, reject) => {
 
@@ -10,7 +10,7 @@ export const publish_my_data_agent = (dataUser) => {
 
         client.on("connect", () => {
 
-            client.publish("/user_login", data, (err) => {
+            client.publish(topicUser, data, (err) => {
 
                 if (err) {
                     client.end();
