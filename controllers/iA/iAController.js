@@ -15,7 +15,7 @@ export const getProcessData = async (req, res) => {
 
         console.log(response);
 
-        if (response.success) {
+        if (!response.success) {
 
             return res.status(404).json({ success: false, message: "Not found." })
         }

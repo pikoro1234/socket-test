@@ -40,17 +40,20 @@ export const getUserProjectsModel = async (reqOptions) => {
         const id = reqOptions.apiAccess !== undefined ? reqOptions.position_user : reqOptions.user.id
         const role_id = reqOptions.apiAccess !== undefined ? reqOptions.position_rol.role_id : reqOptions.user.role_id
 
-        let query = "";
+        let query = "SELECT * FROM clients";
         let params = [];
 
-        if (role_id === 1) {
+        if (role_id === 2) {
 
-            query = "SELECT * FROM clients"
+            query = "SELECT * FROM `user_clients` JOIN clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?";
 
-        } else {
+            params = [ id ];
 
-            query = "SELECT * FROM `user_clients` JOIN clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?"
-            params = [ id ]
+        } else if (role_id === 3) {
+
+            query = "SELECT * FROM `user_clients` JOIN clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?";
+
+            params = [ id ];
         }
 
         const [ dataProjects ] = await pool_urbidata.query(query, params);
@@ -60,7 +63,7 @@ export const getUserProjectsModel = async (reqOptions) => {
             return null;
         }
 
-        return dataProjects
+        return dataProjects;
 
     } catch (error) {
 
@@ -82,15 +85,44 @@ export const getDataCompletModel = async (idUser, rolUser) => {
         JOIN devices ON client_devices.device_id = devices.id_device
         ORDER BY clients.id`;
 
-        let params = '';
+        let params = [];
 
         if (rolUser === 2) {
 
+            query = `SELECT 
+            clients.id AS cliente_id, 
+            clients.name AS cliente_key, 
+            clients.description AS cliente_name, 
+            client_devices.device_id, 
+            devices.id_reference 
+            FROM clients 
+            JOIN client_devices ON clients.id = client_devices.client_id 
+            JOIN devices ON client_devices.device_id = devices.id_device 
+            JOIN user_clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?
+            ORDER BY clients.id;`
+
+            params = [ idUser ];
+
         } else if (rolUser === 3) {
 
+            query = `SELECT 
+            clients.id AS cliente_id, 
+            clients.name AS cliente_key, 
+            clients.description AS cliente_name, 
+            client_devices.device_id, 
+            devices.id_reference 
+            FROM clients 
+            JOIN client_devices ON clients.id = client_devices.client_id 
+            JOIN devices ON client_devices.device_id = devices.id_device 
+            JOIN user_clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?
+            ORDER BY clients.id;`
+
+            params = [ idUser ];
         }
 
         const [ result ] = await pool_urbidata.query(query, [ params ]);
+
+        console.log(result);
 
         const grouped = [];
 
