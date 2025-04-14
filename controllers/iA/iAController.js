@@ -1,5 +1,5 @@
 import { deleteExpiredKeyCommTempUserModel } from '../../models/users/authModel.js';
-import { insertQueriesTrackingModel, getAllQueriesToDb } from '../../models/iA/iAModel.js';
+import { getAllQueriesToDb } from '../../models/iA/iAModel.js';
 import { chatAgentToClient } from '../../helpers/helperIa.js';
 
 
@@ -11,9 +11,11 @@ export const getProcessData = async (req, res) => {
 
         const topic_user = req.body.textcomm
 
-        const response = await chatAgentToClient(topic_user, req.body.prompt);
+        const response = await chatAgentToClient(req.user, topic_user, req.body.prompt);
 
-        if (response.status !== 'success') {
+        console.log(response);
+
+        if (response.success) {
 
             return res.status(404).json({ success: false, message: "Not found." })
         }

@@ -1,12 +1,10 @@
 import { pool_urbidata } from '../../database/bd_urbicomm.js';
 
-export const insertQueriesTrackingModel = async (id_user, id_rol, body_query) => {
-
+export const createQueryChatDb = async (dataUser, queryText) => {
     try {
 
         const query = "INSERT INTO `platform_queries`(`id_user_platform`, `rol_user_platform`, `query_user_platform`) VALUES (?,?,?)";
-        const [ result ] = await pool_urbidata.query(query, [ id_user, id_rol, body_query ]);
-        console.log(result.affectedRows);
+        const [ result ] = await pool_urbidata.query(query, [ dataUser.id, dataUser.role_id, queryText ]);
         return result.affectedRows;
 
     } catch (error) {
