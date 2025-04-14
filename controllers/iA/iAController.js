@@ -1,5 +1,7 @@
+import { deleteExpiredKeyCommTempUserModel } from '../../models/users/authModel.js';
 import { insertQueriesTrackingModel, getAllQueriesToDb } from '../../models/iA/iAModel.js';
 import { chatAgentToClient } from '../../helpers/helperIa.js';
+
 
 export const getProcessData = async (req, res) => {
 
@@ -22,5 +24,21 @@ export const getProcessData = async (req, res) => {
 
         console.log(error);
         return res.status(500).json({ success: false, message: "Internal server error..." })
+    }
+}
+
+export const validateExpireChat = async (req, res) => {
+
+    try {
+
+        if (!req.body.textcomm) return res.status(400).json({ success: false, message: "Bad Request." })
+
+        const topic_user = req.body.textcomm;
+        const response = await deleteExpiredKeyCommTempUserModel(topic_user);
+        return res.status(200).json(response)
+
+    } catch (error) {
+
+        console.log(error);
     }
 }

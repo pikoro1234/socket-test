@@ -51,24 +51,3 @@ const authMiddleware = async (req, res, next) => {
 }
 
 export default authMiddleware;
-
-
-// import jwt from 'jsonwebtoken';
-
-// const authMiddleware = (req, res, next) => {
-
-//     const token = req.cookies.access_token;
-
-//     if (!token) return res.status(401).json({ success: false, message: "No autorizado" });
-
-//     jwt.verify(token, process.env.SECRET_TOKKEN, (err, user) => {
-
-//         if (err) return res.status(403).json({ success: false, message: "Token inválido" });
-
-//         req.user = user;
-
-//         next();
-//     })
-// }
-
-// export default authMiddleware;

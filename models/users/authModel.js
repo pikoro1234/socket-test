@@ -41,7 +41,7 @@ export const generateKeyCommTempUserModel = async (idUser) => {
 
         const textApiKey = `mqtt_channel_id_${crypto.randomBytes(32).toString("hex")}`;
         const hashApiKey = await bcrypt.hash(textApiKey, 10);
-        const expiresAt = new Date(Date.now() + 50 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
 
         const query = "INSERT INTO user_mqtt_channels (user_id, mqtt_channel_id, expires_at) VALUES (?, ?, ?)";
         const [ result ] = await pool_urbidata.query(query, [ idUser, hashApiKey, expiresAt ]);
@@ -52,6 +52,18 @@ export const generateKeyCommTempUserModel = async (idUser) => {
         }
 
         return { message: textApiKey, success: true }
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+export const deleteExpiredKeyCommTempUserModel = async (textKey) => {
+    try {
+
+        const query = "DELETE FROM user_mqtt_channels WHERE expires_at < NOW()";
+        const [ rows ] = await pool_urbidata.query(query);
+        return rows
 
     } catch (error) {
 
