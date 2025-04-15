@@ -51,8 +51,6 @@ export const getDevicesNoFilter = async (req, res) => {
             return res.status(200).json(mappedDevices);
         }
 
-        functionDevicesNoFilter(mappedDevices)
-
         return res.status(404).json({ success: false, message: "Not found." });
 
     } catch (error) {

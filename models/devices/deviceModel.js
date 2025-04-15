@@ -80,39 +80,28 @@ export const importDevicesModel = async (data) => {
                 const longitude = device.coordenadas ? device.coordenadas.longitude : '';
                 const date_created = device.date_created;
 
-                const [ resultExistDevice ] = await pool_urbidata.query(`SELECT * FROM devices WHERE id_device = ?`, [ id_device ])
+                const query = `
+                INSERT INTO devices (id_device, id_reference, type, description, latitude, longitude, date_created)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    id_reference = VALUES(id_reference),
+                    type = VALUES(type),
+                    description = VALUES(description),
+                    latitude = VALUES(latitude),
+                    longitude = VALUES(longitude)
+                `;
 
-                if (resultExistDevice[ 0 ]) {
+                const values = [
+                    id_device,
+                    id_reference,
+                    type,
+                    description,
+                    latitude,
+                    longitude,
+                    date_created
+                ];
 
-                    const queryUpdate = 'UPDATE devices SET id_reference=?, type=?, description=?, latitude=?, longitude=? WHERE id_device = ?';
-
-                    const valuesUpdate = [
-                        id_reference,
-                        type,
-                        description,
-                        latitude,
-                        longitude,
-                        id_device
-                    ];
-
-                    const [ resultUpdate ] = await pool_urbidata.query(queryUpdate, valuesUpdate);
-
-                } else {
-
-                    const queryInsert = `INSERT INTO devices (id_device, id_reference, type, description, latitude, longitude,date_created) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-                    const valuesInsert = [
-                        id_device,
-                        id_reference,
-                        type,
-                        description,
-                        latitude,
-                        longitude,
-                        date_created
-                    ];
-
-                    const [ resultInsert ] = await pool_urbidata.query(queryInsert, valuesInsert);
-                }
+                await pool_urbidata.query(query, values);
 
                 response = 1
 
