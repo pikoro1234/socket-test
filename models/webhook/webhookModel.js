@@ -127,6 +127,14 @@ export const insertEventsWarningsModel = async (data) => {
                 state_warning = "Closed";
             }
 
+            // WATTER SENSOR FISIC/HARDWARE
+            if(idevent === 'water_level_sensor_detected'){
+                id_warning = response_dic_warnins[ 4 ].id;
+                msg_warning = `${extradata}`;
+                level_warning = value === 0 ? level_warning : 'LOW';
+                state_warning = value === 0 ? state_warning : "Closed";
+            }
+
             console.log(type_device);
             console.log(id_device);
             console.log(id_warning);
