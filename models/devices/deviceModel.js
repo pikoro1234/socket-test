@@ -233,14 +233,19 @@ export const getAllNoticesModel = async (devices) => {
         for (const device of devices) {
             const query = "SELECT * FROM `devices_warnings` WHERE id_device = ?";
             const [ result ] = await pool_urbidata.query(query, [ device.id_device ]);
-            const mapped_obj = result.map(notice => ({
-                id_table_notice: notice.id,
-                id_notice: notice.id_warning,
-                id_device_notice: notice.id_device,
-                type_notice: notice.type_warning,
-                state_notice: notice.state,
-                timestamp_notice: notice.date_device,
-                date_notice: notice.date
+
+            const mapped_obj = await Promise.all(result.map(async (notice) => {
+                const auxData = await auxGetDataSingleNotice(notice.id_warning);
+                return {
+                    id_table_notice: notice.id,
+                    id_notice: notice.id_warning,
+                    name_notice: auxData[ 0 ]?.name || "Sin nombre",
+                    id_device_notice: notice.id_device,
+                    level_notice: notice.level_warning,
+                    state_notice: notice.state_warning,
+                    timestamp_notice: notice.date_device,
+                    date_notice: notice.date_warning
+                };
             }));
 
             allNotices.push(...mapped_obj);
@@ -251,5 +256,23 @@ export const getAllNoticesModel = async (devices) => {
     } catch (error) {
 
         console.log(error);
+    }
+}
+
+
+// auxiliares DB single-file
+export const auxGetDataSingleNotice = async (idNotice) => {
+    try {
+
+        const query = "SELECT * FROM `warnings` WHERE id = ?";
+
+        const [ result ] = await pool_urbidata.query(query, [ idNotice ]);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [ "not found" ]
     }
 }
