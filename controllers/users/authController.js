@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { generateKeyCommTempUserModel, loginUserModel, deleteKeyCommTempUserModel } from '../../models/users/authModel.js';
 import { getDataCompletModel } from '../../models/users/userModel.js';
 import { publish_my_data_agent } from '../../helpers/helperIa.js';
-import { getEntorno } from '../../services/custom.js';
+import { my_envoriment } from '../../no-trackin.js';
 
 export const loginUser = async (req, res) => {
 
@@ -27,11 +27,11 @@ export const loginUser = async (req, res) => {
             const refreshToken = jwt.sign(user, process.env.SECRET_TOKKEN, { expiresIn: "7d" });
 
             res.cookie("access_token", accessToken, {
-                httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 50 * 60 * 1000, path: "/"
+                httpOnly: true, secure: my_envoriment, sameSite: my_envoriment ? "None" : "Lax", domain: my_envoriment ? "urbicomm.io" : undefined, maxAge: 50 * 60 * 1000, path: "/"
             });
 
             res.cookie("refresh_token", refreshToken, {
-                httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
+                httpOnly: true, secure: my_envoriment, sameSite: my_envoriment ? "None" : "Lax", domain: my_envoriment ? "urbicomm.io" : undefined, maxAge: 7 * 24 * 60 * 60 * 1000, path: "/"
             });
 
             const data_complet_user = await getDataCompletModel(response.uuid, response.rol_id);
@@ -64,11 +64,11 @@ export const logoutUser = async (req, res) => {
     try {
 
         res.clearCookie("access_token", {
-            httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+            httpOnly: true, secure: my_envoriment, sameSite: my_envoriment ? "None" : "Lax", domain: my_envoriment ? "urbicomm.io" : undefined, path: "/"
         });
 
         res.clearCookie("refresh_token", {
-            httpOnly: true, secure: getEntorno(), sameSite: getEntorno() ? "None" : "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, path: "/"
+            httpOnly: true, secure: my_envoriment, sameSite: my_envoriment ? "None" : "Lax", domain: my_envoriment ? "urbicomm.io" : undefined, path: "/"
         });
 
         if (req.body.comm_chat_text) {
@@ -114,7 +114,7 @@ export const refreshToken = async (req, res) => {
             const newAccessToken = jwt.sign({ id: user.id, username: user.username }, process.env.SECRET_TOKKEN, { expiresIn: "15m" });
 
             res.cookie("access_token", newAccessToken, {
-                httpOnly: true, secure: getEntorno(), sameSite: "Lax", domain: getEntorno() ? "urbicomm.io" : undefined, maxAge: 15 * 60 * 1000, path: "/",
+                httpOnly: true, secure: my_envoriment, sameSite: "Lax", domain: my_envoriment ? "urbicomm.io" : undefined, maxAge: 15 * 60 * 1000, path: "/",
             });
 
             res.json({ message: "Access token renovado correctamente", success: true });
