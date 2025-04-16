@@ -93,7 +93,24 @@ app.use('/protected', apiKeyRouter);
 
 
 
-
+app.post('/test', async (req, res) => {
+    await fetch('https://hooks.zapier.com/hooks/catch/17498436/2077757/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization':'ApiKey urbicomm_urbidermis_f4ecd0532647a7337bc15770904910660d3d7afd6ddcdaff5be6edfc4519f02d'
+        },
+        body: JSON.stringify({
+            idSensor: 'JAT1002T',
+            timeStamp: '2025-04-15 13:27:12.538',
+            idevent: 'hola',
+            value: 1,
+            extradata: 'Change'
+        })
+    });
+    console.log("enviamos datos");
+    console.log(res);
+})
 
 
 

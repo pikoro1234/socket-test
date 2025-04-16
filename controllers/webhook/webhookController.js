@@ -1,4 +1,4 @@
-import { insertEventsModel } from '../../models/webhook/webhookModel.js';
+import { insertEventsWarningsModel } from '../../models/webhook/webhookModel.js';
 
 export const insertEvents = async (req, res) => {
 
@@ -14,7 +14,7 @@ export const insertEvents = async (req, res) => {
             return res.status(404).json({ success: false, message: "Not found." });
         }
 
-        const response = await insertEventsModel(req.body);
+        const response = await insertEventsWarningsModel(req.body);
 
         if (response === 0) {
 
