@@ -259,8 +259,7 @@ export const getAllNoticesModel = async (devices) => {
     }
 }
 
-
-// auxiliares DB single-file
+// auxiliares DB --> solo para uso interno
 export const auxGetDataSingleNotice = async (idNotice) => {
     try {
 
