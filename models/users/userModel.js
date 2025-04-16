@@ -79,7 +79,8 @@ export const getDataCompletModel = async (idUser, rolUser) => {
         clients.name AS cliente_key,
         clients.description AS cliente_name,
         client_devices.device_id,
-        devices.id_reference
+        devices.id_reference,
+        devices.description
         FROM clients
         JOIN client_devices ON clients.id = client_devices.client_id
         JOIN devices ON client_devices.device_id = devices.id_device
@@ -94,7 +95,8 @@ export const getDataCompletModel = async (idUser, rolUser) => {
             clients.name AS cliente_key, 
             clients.description AS cliente_name, 
             client_devices.device_id, 
-            devices.id_reference 
+            devices.id_reference,
+            devices.description 
             FROM clients 
             JOIN client_devices ON clients.id = client_devices.client_id 
             JOIN devices ON client_devices.device_id = devices.id_device 
@@ -110,7 +112,8 @@ export const getDataCompletModel = async (idUser, rolUser) => {
             clients.name AS cliente_key, 
             clients.description AS cliente_name, 
             client_devices.device_id, 
-            devices.id_reference 
+            devices.id_reference,
+            devices.description 
             FROM clients 
             JOIN client_devices ON clients.id = client_devices.client_id 
             JOIN devices ON client_devices.device_id = devices.id_device 
@@ -145,6 +148,7 @@ export const getDataCompletModel = async (idUser, rolUser) => {
             map.get(clientId).devices.push({
                 id: row.device_id,
                 id_reference: row.id_reference,
+                description_device: row.description,
             });
         }
 
