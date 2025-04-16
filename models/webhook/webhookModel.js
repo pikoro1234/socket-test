@@ -24,11 +24,13 @@ export const insertEventsWarningsModel = async (data) => {
         msg_warning = "",
         level_warning = "HIGH",
         state_warning = "Open",
-        date_device = data.data.timeStamp;
+        date_device = data.data.timeStamp ? data.data.timeStamp : data.timestamp;
+
+    console.log(data);
 
     try {
 
-        if (type_device === 'Solana') {
+        if (type_device === 'Solana' && topic_hook === "events") {
 
             const { idevent, value, extradata } = data.data;
 
@@ -145,7 +147,6 @@ export const insertEventsWarningsModel = async (data) => {
                 date_device ];
 
             const [ result ] = await pool_urbidata.query(query, params);
-
             console.log(result);
         }
 
