@@ -68,13 +68,13 @@ export async function chatAgentToClient(dataUser, topicUser, prompt) {
                 try {
 
                     const parsedMessage = JSON.parse(lastResponse);
-                    console.log(parsedMessage);
+                    // console.log(parsedMessage);
                     if (parsedMessage.error) {
 
                         resolve({ success: false, status: "error", data: parsedMessage.error });
                     } else {
 
-                        createQueryChatDb(dataUser, JSON.parse(query).prompt);
+                        createQueryChatDb(dataUser, JSON.parse(query).prompt,parsedMessage);
                         resolve({ success: true, status: "success", data: parsedMessage });
                     }
 

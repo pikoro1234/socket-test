@@ -259,8 +259,130 @@ export const getAllNoticesModel = async (devices) => {
     }
 }
 
-// auxiliares DB --> solo para uso interno
+// preparamos los datos de lo que se le tiene que notificar al usuario
+// con relaciones a los devices por medio de su rol
+// retornamos todos los datos preparados segun lo que el usuario quiere ser notificado
+export const prepareDataNotificationsModel = async (noticesSelectUser) => {
+
+    let array_response = []
+
+    try {
+
+        for (const notice of noticesSelectUser) {
+            let data_user = await auxGetMyData(notice.user_id)
+            let data_notice = await auxGetDataSingleNotice(notice.notice_id);
+            let data_devices = await auxGetMyDevices(notice.user_id, data_user[ 0 ].role_id);
+            let response = {
+                "user_rol": data_user[ 0 ].role_id,
+                "user_email": data_user[ 0 ].email,
+                "user_phone": data_user[ 0 ].phone,
+                "notify_email": data_user[ 0 ].notify_email,
+                "notify_phone": data_user[ 0 ].notify_phone,
+                "notice_key": data_notice[ 0 ].id,
+                "notice_name": data_notice[ 0 ].name,
+                "notice_description": data_notice[ 0 ].description,
+                "devices": data_devices
+            }
+            array_response.push(response);
+        }
+
+        return array_response;
+
+    } catch (error) {
+
+        console.log(error);
+        return array_response;
+    }
+}
+
+export const sendAllNotificationsModel = async (noticesSelectUser) => {
+
+    try {
+
+        let result = await prepareDataNotificationsModel(noticesSelectUser);
+
+        for (const element of result) {
+
+            console.log(element);
+        }
+
+        // return result;
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+// auxiliares DB --> solo para uso interno del mismo fichero
+export const auxGetMyData = async (idUser) => {
+
+    try {
+
+        const query = "SELECT * FROM `users` JOIN user_roles ON users.uuid = user_roles.user_id WHERE uuid = ?";
+
+        const [ result ] = await pool_urbidata.query(query, [ idUser ]);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [ "not found" ]
+    }
+}
+
+export const auxGetMyDevices = async (idUser, idRol) => {
+
+    try {
+
+        let query = `SELECT 
+        client_devices.device_id
+        FROM clients
+        JOIN client_devices ON clients.id = client_devices.client_id
+        JOIN devices ON client_devices.device_id = devices.id_device
+        ORDER BY clients.id`;
+
+        let params = [];
+
+        if (idRol === 2) {
+
+            query = `SELECT 
+            client_devices.device_id
+            FROM clients 
+            JOIN client_devices ON clients.id = client_devices.client_id 
+            JOIN devices ON client_devices.device_id = devices.id_device 
+            JOIN user_clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?
+            ORDER BY clients.id;`
+
+            params = [ idUser ];
+
+        } else if (idRol === 3) {
+
+            query = `SELECT 
+            client_devices.device_id
+            FROM clients 
+            JOIN client_devices ON clients.id = client_devices.client_id 
+            JOIN devices ON client_devices.device_id = devices.id_device 
+            JOIN user_clients ON user_clients.client_id = clients.id WHERE user_clients.user_id = ?
+            ORDER BY clients.id;`
+
+            params = [ idUser ];
+        }
+
+        const [ result ] = await pool_urbidata.query(query, [ params ]);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [ "not found" ]
+    }
+}
+
 export const auxGetDataSingleNotice = async (idNotice) => {
+
     try {
 
         const query = "SELECT * FROM `warnings` WHERE id = ?";
@@ -273,5 +395,84 @@ export const auxGetDataSingleNotice = async (idNotice) => {
 
         console.log(error);
         return [ "not found" ]
+    }
+}
+
+export const auxGetDataRelationUserNotify = async () => {
+
+    try {
+
+        const query = "SELECT * FROM `user_warnings`";
+
+        const [ result ] = await pool_urbidata.query(query);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [];
+    }
+}
+
+// desde aqui
+export const auxGetMyNoticesSelected = async (idUser) => {
+
+    try {
+
+        const query = "SELECT notice_id FROM `user_warnings` WHERE user_id = ?";
+
+        const [ result ] = await pool_urbidata.query(query, [ idUser ]);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [ "not found" ]
+    }
+}
+
+export const auxGetListUsersDb = async () => {
+
+    try {
+
+        const query = "SELECT * FROM `users` JOIN user_roles ON users.uuid = user_roles.user_id";
+
+        const [ result ] = await pool_urbidata.query(query);
+
+        return result;
+
+    } catch (error) {
+
+        console.log(error);
+        return [ "not found" ]
+    }
+}
+// export const
+export const auxGetUserGroupNotices = async (listUsers) => {
+
+    try {
+
+        // aqui pasamos la lista de devices y la lista de warnings que tiene el user
+        //y recorremos las jardineras y por  cada verificamos tiene ese warning activo ese dia 
+
+        for (const user of listUsers) {
+            // let data_user_notices = await auxGetMyNoticesSelected(user.uuid);
+            let data_user_devices = await auxGetMyDevices(user.uuid, user.role_id);
+            let obj_response = {
+                email: user.email,
+                name: user.name,
+                phone: user.phone,
+                notify_email: user.notify_email,
+                notify_phone: user.notify_phone,
+                // notices_select: data_user_notices,
+                devices: data_user_devices,
+            }
+            console.log(obj_response);
+        }
+    } catch (error) {
+
+        console.log(error);
     }
 }

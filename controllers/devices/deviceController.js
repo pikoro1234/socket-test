@@ -1,7 +1,19 @@
 import { header_http_urbicomm, uri_getter_device } from '../../no-trackin.js';
 import { customFetch } from '../../services/custom.js';
 import { getNoFilterWorkSpace, filterCustomField, mappedStructDevice } from '../../helpers/helperDevices.js';
-import { getDevicesModel, getDevicesNoFilterModel, importDevicesModel, getMyDetailsDeviceModel, getMyDataHistoricDeviceModel, getAllNoticesModel } from '../../models/devices/deviceModel.js';
+import {
+    getDevicesModel,
+    getDevicesNoFilterModel,
+    importDevicesModel,
+    getMyDetailsDeviceModel,
+    getMyDataHistoricDeviceModel,
+    getAllNoticesModel,
+    // sendAllNotificationsModel,
+    // auxGetDataRelationUserNotify
+
+    auxGetListUsersDb,
+    auxGetUserGroupNotices
+} from '../../models/devices/deviceModel.js';
 
 export const getDevices = async (req, res) => {
 
@@ -164,6 +176,31 @@ export const getAllNotices = async (req, res) => {
 
     } catch (error) {
 
+        console.log(error);
+    }
+}
+
+export const sendAllNotifications = async (req, res) => {
+
+    try {
+
+        // obtenemos todas las notificacion relacionadas a los usuarios
+        // const users_notify = await auxGetDataRelationUserNotify();
+
+        // const response = await sendAllNotificationsModel(users_notify);
+
+        // console.log(response);
+
+
+        // nueva logica
+        const users_in_db = await auxGetListUsersDb();
+
+        const assoc_user_with_notices = await auxGetUserGroupNotices(users_in_db);
+        // console.log(assoc_user_with_notices);
+
+        return res.json({ msg: "notificacion desde el controlador" })
+
+    } catch (error) {
         console.log(error);
     }
 }
