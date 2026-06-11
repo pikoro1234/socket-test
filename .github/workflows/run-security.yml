@@ -1,0 +1,12 @@
+name: 🔐 Run Security Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security:
+    uses: Developer-SantaCole/security-workflows/.github/workflows/security-gate.yml@main
+    secrets: inherit
